@@ -5,7 +5,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
-  "/home/david/school/s19/csc471/p3.1/ext/glad/src/glad.c" "/home/david/school/s19/csc471/p3.1/build/CMakeFiles/p3.dir/ext/glad/src/glad.c.o"
+  "/home/david/school/s19/csc471/demRender/ext/glad/src/glad.c" "/home/david/school/s19/csc471/demRender/build/CMakeFiles/p3.dir/ext/glad/src/glad.c.o"
   )
 set(CMAKE_C_COMPILER_ID "GNU")
 
@@ -16,16 +16,16 @@ set(CMAKE_C_TARGET_INCLUDE_PATH
   "/home/david/school/s19/csc471/deps/glfw-3.2.1/include"
   )
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/david/school/s19/csc471/p3.1/ext/tiny_obj_loader/tiny_obj_loader.cpp" "/home/david/school/s19/csc471/p3.1/build/CMakeFiles/p3.dir/ext/tiny_obj_loader/tiny_obj_loader.cpp.o"
-  "/home/david/school/s19/csc471/p3.1/src/GLSL.cpp" "/home/david/school/s19/csc471/p3.1/build/CMakeFiles/p3.dir/src/GLSL.cpp.o"
-  "/home/david/school/s19/csc471/p3.1/src/MatrixStack.cpp" "/home/david/school/s19/csc471/p3.1/build/CMakeFiles/p3.dir/src/MatrixStack.cpp.o"
-  "/home/david/school/s19/csc471/p3.1/src/Program.cpp" "/home/david/school/s19/csc471/p3.1/build/CMakeFiles/p3.dir/src/Program.cpp.o"
-  "/home/david/school/s19/csc471/p3.1/src/Shape.cpp" "/home/david/school/s19/csc471/p3.1/build/CMakeFiles/p3.dir/src/Shape.cpp.o"
-  "/home/david/school/s19/csc471/p3.1/src/Texture.cpp" "/home/david/school/s19/csc471/p3.1/build/CMakeFiles/p3.dir/src/Texture.cpp.o"
-  "/home/david/school/s19/csc471/p3.1/src/WindowManager.cpp" "/home/david/school/s19/csc471/p3.1/build/CMakeFiles/p3.dir/src/WindowManager.cpp.o"
-  "/home/david/school/s19/csc471/p3.1/src/main.cpp" "/home/david/school/s19/csc471/p3.1/build/CMakeFiles/p3.dir/src/main.cpp.o"
-  "/home/david/school/s19/csc471/p3.1/src/objectDefs.cpp" "/home/david/school/s19/csc471/p3.1/build/CMakeFiles/p3.dir/src/objectDefs.cpp.o"
-  "/home/david/school/s19/csc471/p3.1/src/tifftest.cpp" "/home/david/school/s19/csc471/p3.1/build/CMakeFiles/p3.dir/src/tifftest.cpp.o"
+  "/home/david/school/s19/csc471/demRender/ext/tiny_obj_loader/tiny_obj_loader.cpp" "/home/david/school/s19/csc471/demRender/build/CMakeFiles/p3.dir/ext/tiny_obj_loader/tiny_obj_loader.cpp.o"
+  "/home/david/school/s19/csc471/demRender/src/GLSL.cpp" "/home/david/school/s19/csc471/demRender/build/CMakeFiles/p3.dir/src/GLSL.cpp.o"
+  "/home/david/school/s19/csc471/demRender/src/MatrixStack.cpp" "/home/david/school/s19/csc471/demRender/build/CMakeFiles/p3.dir/src/MatrixStack.cpp.o"
+  "/home/david/school/s19/csc471/demRender/src/Program.cpp" "/home/david/school/s19/csc471/demRender/build/CMakeFiles/p3.dir/src/Program.cpp.o"
+  "/home/david/school/s19/csc471/demRender/src/Shape.cpp" "/home/david/school/s19/csc471/demRender/build/CMakeFiles/p3.dir/src/Shape.cpp.o"
+  "/home/david/school/s19/csc471/demRender/src/Texture.cpp" "/home/david/school/s19/csc471/demRender/build/CMakeFiles/p3.dir/src/Texture.cpp.o"
+  "/home/david/school/s19/csc471/demRender/src/WindowManager.cpp" "/home/david/school/s19/csc471/demRender/build/CMakeFiles/p3.dir/src/WindowManager.cpp.o"
+  "/home/david/school/s19/csc471/demRender/src/main.cpp" "/home/david/school/s19/csc471/demRender/build/CMakeFiles/p3.dir/src/main.cpp.o"
+  "/home/david/school/s19/csc471/demRender/src/objectDefs.cpp" "/home/david/school/s19/csc471/demRender/build/CMakeFiles/p3.dir/src/objectDefs.cpp.o"
+  "/home/david/school/s19/csc471/demRender/src/tifftest.cpp" "/home/david/school/s19/csc471/demRender/build/CMakeFiles/p3.dir/src/tifftest.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

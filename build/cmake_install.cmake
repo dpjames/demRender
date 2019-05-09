@@ -1,4 +1,4 @@
-# Install script for directory: /home/david/school/s19/csc471/p3.1
+# Install script for directory: /home/david/school/s19/csc471/demRender
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -51,5 +51,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/david/school/s19/csc471/p3.1/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/david/school/s19/csc471/demRender/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

@@ -107,8 +107,7 @@ class LandCover : public Renderable {
                 glm::vec3 minrot, 
                 glm::vec3 maxrot, 
                 GLfloat n, 
-                shared_ptr<Program> shaderin, 
-                string objname);
+                unsigned char landType);
       void render(shared_ptr<MatrixStack> Projection,
                   shared_ptr<MatrixStack> View,
                   shared_ptr<MatrixStack> Model);

@@ -195,9 +195,7 @@ void Topo::render(shared_ptr<MatrixStack> Projection,
 void LandCover::init(glm::vec3 tTrans,   glm::vec3 tScale, glm::vec3 trans, 
                      glm::vec3 minscale, glm::vec3 maxscale, 
                      glm::vec3 minrot,   glm::vec3 maxrot, 
-                     GLfloat n,          shared_ptr<Program> shaderin,
-                     string objname){
-
+                     GLfloat n,          unsigned int landType){
    readObj(objname.c_str(), mesh);
    shader = shaderin;
    nchildren = n;
