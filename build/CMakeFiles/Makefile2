@@ -62,7 +62,7 @@ CMAKE_BINARY_DIR = /home/dpjames/demRender/build
 CMakeFiles/p3.dir/all:
 	$(MAKE) -f CMakeFiles/p3.dir/build.make CMakeFiles/p3.dir/depend
 	$(MAKE) -f CMakeFiles/p3.dir/build.make CMakeFiles/p3.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/dpjames/demRender/build/CMakeFiles  1 2 3 4 5 6 7 8 9 10 11
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/dpjames/demRender/build/CMakeFiles  1 2 3 4 5 6 7 8 9 10
 	@echo "Built target p3"
 .PHONY : CMakeFiles/p3.dir/all
 
@@ -72,7 +72,7 @@ all: CMakeFiles/p3.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/p3.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/dpjames/demRender/build/CMakeFiles 11
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/dpjames/demRender/build/CMakeFiles 10
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/p3.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/dpjames/demRender/build/CMakeFiles 0
 .PHONY : CMakeFiles/p3.dir/rule

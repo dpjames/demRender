@@ -236,32 +236,9 @@ CMakeFiles/p3.dir/src/objectDefs.cpp.o.provides: CMakeFiles/p3.dir/src/objectDef
 
 CMakeFiles/p3.dir/src/objectDefs.cpp.o.provides.build: CMakeFiles/p3.dir/src/objectDefs.cpp.o
 
-CMakeFiles/p3.dir/src/tifftest.cpp.o: CMakeFiles/p3.dir/flags.make
-CMakeFiles/p3.dir/src/tifftest.cpp.o: ../src/tifftest.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/dpjames/demRender/build/CMakeFiles $(CMAKE_PROGRESS_9)
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/p3.dir/src/tifftest.cpp.o"
-	/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/p3.dir/src/tifftest.cpp.o -c /home/dpjames/demRender/src/tifftest.cpp
-
-CMakeFiles/p3.dir/src/tifftest.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/p3.dir/src/tifftest.cpp.i"
-	/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/dpjames/demRender/src/tifftest.cpp > CMakeFiles/p3.dir/src/tifftest.cpp.i
-
-CMakeFiles/p3.dir/src/tifftest.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/p3.dir/src/tifftest.cpp.s"
-	/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/dpjames/demRender/src/tifftest.cpp -o CMakeFiles/p3.dir/src/tifftest.cpp.s
-
-CMakeFiles/p3.dir/src/tifftest.cpp.o.requires:
-.PHONY : CMakeFiles/p3.dir/src/tifftest.cpp.o.requires
-
-CMakeFiles/p3.dir/src/tifftest.cpp.o.provides: CMakeFiles/p3.dir/src/tifftest.cpp.o.requires
-	$(MAKE) -f CMakeFiles/p3.dir/build.make CMakeFiles/p3.dir/src/tifftest.cpp.o.provides.build
-.PHONY : CMakeFiles/p3.dir/src/tifftest.cpp.o.provides
-
-CMakeFiles/p3.dir/src/tifftest.cpp.o.provides.build: CMakeFiles/p3.dir/src/tifftest.cpp.o
-
 CMakeFiles/p3.dir/ext/tiny_obj_loader/tiny_obj_loader.cpp.o: CMakeFiles/p3.dir/flags.make
 CMakeFiles/p3.dir/ext/tiny_obj_loader/tiny_obj_loader.cpp.o: ../ext/tiny_obj_loader/tiny_obj_loader.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/dpjames/demRender/build/CMakeFiles $(CMAKE_PROGRESS_10)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/dpjames/demRender/build/CMakeFiles $(CMAKE_PROGRESS_9)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/p3.dir/ext/tiny_obj_loader/tiny_obj_loader.cpp.o"
 	/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/p3.dir/ext/tiny_obj_loader/tiny_obj_loader.cpp.o -c /home/dpjames/demRender/ext/tiny_obj_loader/tiny_obj_loader.cpp
 
@@ -284,7 +261,7 @@ CMakeFiles/p3.dir/ext/tiny_obj_loader/tiny_obj_loader.cpp.o.provides.build: CMak
 
 CMakeFiles/p3.dir/ext/glad/src/glad.c.o: CMakeFiles/p3.dir/flags.make
 CMakeFiles/p3.dir/ext/glad/src/glad.c.o: ../ext/glad/src/glad.c
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/dpjames/demRender/build/CMakeFiles $(CMAKE_PROGRESS_11)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/dpjames/demRender/build/CMakeFiles $(CMAKE_PROGRESS_10)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object CMakeFiles/p3.dir/ext/glad/src/glad.c.o"
 	/bin/cc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/p3.dir/ext/glad/src/glad.c.o   -c /home/dpjames/demRender/ext/glad/src/glad.c
 
@@ -315,7 +292,6 @@ p3_OBJECTS = \
 "CMakeFiles/p3.dir/src/WindowManager.cpp.o" \
 "CMakeFiles/p3.dir/src/main.cpp.o" \
 "CMakeFiles/p3.dir/src/objectDefs.cpp.o" \
-"CMakeFiles/p3.dir/src/tifftest.cpp.o" \
 "CMakeFiles/p3.dir/ext/tiny_obj_loader/tiny_obj_loader.cpp.o" \
 "CMakeFiles/p3.dir/ext/glad/src/glad.c.o"
 
@@ -330,7 +306,6 @@ p3: CMakeFiles/p3.dir/src/Texture.cpp.o
 p3: CMakeFiles/p3.dir/src/WindowManager.cpp.o
 p3: CMakeFiles/p3.dir/src/main.cpp.o
 p3: CMakeFiles/p3.dir/src/objectDefs.cpp.o
-p3: CMakeFiles/p3.dir/src/tifftest.cpp.o
 p3: CMakeFiles/p3.dir/ext/tiny_obj_loader/tiny_obj_loader.cpp.o
 p3: CMakeFiles/p3.dir/ext/glad/src/glad.c.o
 p3: CMakeFiles/p3.dir/build.make
@@ -350,7 +325,6 @@ CMakeFiles/p3.dir/requires: CMakeFiles/p3.dir/src/Texture.cpp.o.requires
 CMakeFiles/p3.dir/requires: CMakeFiles/p3.dir/src/WindowManager.cpp.o.requires
 CMakeFiles/p3.dir/requires: CMakeFiles/p3.dir/src/main.cpp.o.requires
 CMakeFiles/p3.dir/requires: CMakeFiles/p3.dir/src/objectDefs.cpp.o.requires
-CMakeFiles/p3.dir/requires: CMakeFiles/p3.dir/src/tifftest.cpp.o.requires
 CMakeFiles/p3.dir/requires: CMakeFiles/p3.dir/ext/tiny_obj_loader/tiny_obj_loader.cpp.o.requires
 CMakeFiles/p3.dir/requires: CMakeFiles/p3.dir/ext/glad/src/glad.c.o.requires
 .PHONY : CMakeFiles/p3.dir/requires

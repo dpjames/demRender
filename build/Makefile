@@ -354,30 +354,6 @@ src/objectDefs.cpp.s:
 	$(MAKE) -f CMakeFiles/p3.dir/build.make CMakeFiles/p3.dir/src/objectDefs.cpp.s
 .PHONY : src/objectDefs.cpp.s
 
-src/tifftest.o: src/tifftest.cpp.o
-.PHONY : src/tifftest.o
-
-# target to build an object file
-src/tifftest.cpp.o:
-	$(MAKE) -f CMakeFiles/p3.dir/build.make CMakeFiles/p3.dir/src/tifftest.cpp.o
-.PHONY : src/tifftest.cpp.o
-
-src/tifftest.i: src/tifftest.cpp.i
-.PHONY : src/tifftest.i
-
-# target to preprocess a source file
-src/tifftest.cpp.i:
-	$(MAKE) -f CMakeFiles/p3.dir/build.make CMakeFiles/p3.dir/src/tifftest.cpp.i
-.PHONY : src/tifftest.cpp.i
-
-src/tifftest.s: src/tifftest.cpp.s
-.PHONY : src/tifftest.s
-
-# target to generate assembly for a file
-src/tifftest.cpp.s:
-	$(MAKE) -f CMakeFiles/p3.dir/build.make CMakeFiles/p3.dir/src/tifftest.cpp.s
-.PHONY : src/tifftest.cpp.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -417,9 +393,6 @@ help:
 	@echo "... src/objectDefs.o"
 	@echo "... src/objectDefs.i"
 	@echo "... src/objectDefs.s"
-	@echo "... src/tifftest.o"
-	@echo "... src/tifftest.i"
-	@echo "... src/tifftest.s"
 .PHONY : help
 
 
