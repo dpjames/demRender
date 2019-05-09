@@ -39,15 +39,14 @@ CMakeFiles/p3.dir/src/Texture.cpp.o: ../src/stb_image.h
 
 CMakeFiles/p3.dir/src/WindowManager.cpp.o: ../ext/glad/include/KHR/khrplatform.h
 CMakeFiles/p3.dir/src/WindowManager.cpp.o: ../ext/glad/include/glad/glad.h
-CMakeFiles/p3.dir/src/WindowManager.cpp.o: /home/david/school/s19/csc471/deps/glfw-3.2.1/include/GLFW/glfw3.h
 CMakeFiles/p3.dir/src/WindowManager.cpp.o: ../src/GLSL.h
 CMakeFiles/p3.dir/src/WindowManager.cpp.o: ../src/WindowManager.cpp
 CMakeFiles/p3.dir/src/WindowManager.cpp.o: ../src/WindowManager.h
+CMakeFiles/p3.dir/src/WindowManager.cpp.o: /home/david/school/s19/csc471/deps/glfw-3.2.1/include/GLFW/glfw3.h
 
 CMakeFiles/p3.dir/src/main.cpp.o: ../ext/glad/include/KHR/khrplatform.h
 CMakeFiles/p3.dir/src/main.cpp.o: ../ext/glad/include/glad/glad.h
 CMakeFiles/p3.dir/src/main.cpp.o: ../ext/tiny_obj_loader/tiny_obj_loader.h
-CMakeFiles/p3.dir/src/main.cpp.o: /home/david/school/s19/csc471/deps/glfw-3.2.1/include/GLFW/glfw3.h
 CMakeFiles/p3.dir/src/main.cpp.o: ../src/GLSL.h
 CMakeFiles/p3.dir/src/main.cpp.o: ../src/MatrixStack.h
 CMakeFiles/p3.dir/src/main.cpp.o: ../src/Program.h
@@ -56,11 +55,11 @@ CMakeFiles/p3.dir/src/main.cpp.o: ../src/WindowManager.h
 CMakeFiles/p3.dir/src/main.cpp.o: ../src/main.cpp
 CMakeFiles/p3.dir/src/main.cpp.o: ../src/objectDefs.h
 CMakeFiles/p3.dir/src/main.cpp.o: ../src/stb_image.h
+CMakeFiles/p3.dir/src/main.cpp.o: /home/david/school/s19/csc471/deps/glfw-3.2.1/include/GLFW/glfw3.h
 
 CMakeFiles/p3.dir/src/objectDefs.cpp.o: ../ext/glad/include/KHR/khrplatform.h
 CMakeFiles/p3.dir/src/objectDefs.cpp.o: ../ext/glad/include/glad/glad.h
 CMakeFiles/p3.dir/src/objectDefs.cpp.o: ../ext/tiny_obj_loader/tiny_obj_loader.h
-CMakeFiles/p3.dir/src/objectDefs.cpp.o: /home/david/school/s19/csc471/deps/glfw-3.2.1/include/GLFW/glfw3.h
 CMakeFiles/p3.dir/src/objectDefs.cpp.o: ../src/GLSL.h
 CMakeFiles/p3.dir/src/objectDefs.cpp.o: ../src/MatrixStack.h
 CMakeFiles/p3.dir/src/objectDefs.cpp.o: ../src/Program.h
@@ -69,6 +68,7 @@ CMakeFiles/p3.dir/src/objectDefs.cpp.o: ../src/WindowManager.h
 CMakeFiles/p3.dir/src/objectDefs.cpp.o: ../src/objectDefs.cpp
 CMakeFiles/p3.dir/src/objectDefs.cpp.o: ../src/objectDefs.h
 CMakeFiles/p3.dir/src/objectDefs.cpp.o: ../src/stb_image.h
+CMakeFiles/p3.dir/src/objectDefs.cpp.o: /home/david/school/s19/csc471/deps/glfw-3.2.1/include/GLFW/glfw3.h
 
 CMakeFiles/p3.dir/src/tifftest.cpp.o: ../src/tifftest.cpp
 

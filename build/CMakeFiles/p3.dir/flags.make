@@ -7,11 +7,11 @@ C_FLAGS =
 
 C_DEFINES = 
 
-C_INCLUDES = -I/home/david/school/s19/csc471/p3.1/ext -I/home/david/school/s19/csc471/p3.1/ext/glad/include -I/home/david/school/s19/csc471/deps/glfw-3.2.1/include 
+C_INCLUDES = -I/home/david/school/s19/csc471/demRender/ext -I/home/david/school/s19/csc471/demRender/ext/glad/include -I/home/david/school/s19/csc471/deps/glfw-3.2.1/include 
 
 CXX_FLAGS =  -std=c++0x -Wall -pedantic  
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/david/school/s19/csc471/p3.1/ext -I/home/david/school/s19/csc471/p3.1/ext/glad/include -I/home/david/school/s19/csc471/deps/glfw-3.2.1/include 
+CXX_INCLUDES = -I/home/david/school/s19/csc471/demRender/ext -I/home/david/school/s19/csc471/demRender/ext/glad/include -I/home/david/school/s19/csc471/deps/glfw-3.2.1/include 
 

@@ -4,71 +4,71 @@
 CMakeFiles/p3.dir/ext/glad/src/glad.c.o
  ../ext/glad/include/KHR/khrplatform.h
  ../ext/glad/include/glad/glad.h
- /home/david/school/s19/csc471/p3.1/ext/glad/src/glad.c
+ /home/david/school/s19/csc471/demRender/ext/glad/src/glad.c
 CMakeFiles/p3.dir/ext/tiny_obj_loader/tiny_obj_loader.cpp.o
- /home/david/school/s19/csc471/p3.1/ext/tiny_obj_loader/tiny_obj_loader.cpp
- /home/david/school/s19/csc471/p3.1/ext/tiny_obj_loader/tiny_obj_loader.h
+ /home/david/school/s19/csc471/demRender/ext/tiny_obj_loader/tiny_obj_loader.cpp
+ /home/david/school/s19/csc471/demRender/ext/tiny_obj_loader/tiny_obj_loader.h
 CMakeFiles/p3.dir/src/GLSL.cpp.o
  ../ext/glad/include/KHR/khrplatform.h
  ../ext/glad/include/glad/glad.h
- /home/david/school/s19/csc471/p3.1/src/GLSL.cpp
- /home/david/school/s19/csc471/p3.1/src/GLSL.h
+ /home/david/school/s19/csc471/demRender/src/GLSL.cpp
+ /home/david/school/s19/csc471/demRender/src/GLSL.h
 CMakeFiles/p3.dir/src/MatrixStack.cpp.o
- /home/david/school/s19/csc471/p3.1/src/MatrixStack.cpp
- /home/david/school/s19/csc471/p3.1/src/MatrixStack.h
+ /home/david/school/s19/csc471/demRender/src/MatrixStack.cpp
+ /home/david/school/s19/csc471/demRender/src/MatrixStack.h
 CMakeFiles/p3.dir/src/Program.cpp.o
  ../ext/glad/include/KHR/khrplatform.h
  ../ext/glad/include/glad/glad.h
- /home/david/school/s19/csc471/p3.1/src/GLSL.h
- /home/david/school/s19/csc471/p3.1/src/Program.cpp
- /home/david/school/s19/csc471/p3.1/src/Program.h
+ /home/david/school/s19/csc471/demRender/src/GLSL.h
+ /home/david/school/s19/csc471/demRender/src/Program.cpp
+ /home/david/school/s19/csc471/demRender/src/Program.h
 CMakeFiles/p3.dir/src/Shape.cpp.o
  ../ext/glad/include/KHR/khrplatform.h
  ../ext/glad/include/glad/glad.h
  ../ext/tiny_obj_loader/tiny_obj_loader.h
- /home/david/school/s19/csc471/p3.1/src/GLSL.h
- /home/david/school/s19/csc471/p3.1/src/Program.h
- /home/david/school/s19/csc471/p3.1/src/Shape.cpp
- /home/david/school/s19/csc471/p3.1/src/Shape.h
+ /home/david/school/s19/csc471/demRender/src/GLSL.h
+ /home/david/school/s19/csc471/demRender/src/Program.h
+ /home/david/school/s19/csc471/demRender/src/Shape.cpp
+ /home/david/school/s19/csc471/demRender/src/Shape.h
 CMakeFiles/p3.dir/src/Texture.cpp.o
  ../ext/glad/include/KHR/khrplatform.h
  ../ext/glad/include/glad/glad.h
- /home/david/school/s19/csc471/p3.1/src/GLSL.h
- /home/david/school/s19/csc471/p3.1/src/Texture.cpp
- /home/david/school/s19/csc471/p3.1/src/Texture.h
- /home/david/school/s19/csc471/p3.1/src/stb_image.h
+ /home/david/school/s19/csc471/demRender/src/GLSL.h
+ /home/david/school/s19/csc471/demRender/src/Texture.cpp
+ /home/david/school/s19/csc471/demRender/src/Texture.h
+ /home/david/school/s19/csc471/demRender/src/stb_image.h
 CMakeFiles/p3.dir/src/WindowManager.cpp.o
  ../ext/glad/include/KHR/khrplatform.h
  ../ext/glad/include/glad/glad.h
+ /home/david/school/s19/csc471/demRender/src/GLSL.h
+ /home/david/school/s19/csc471/demRender/src/WindowManager.cpp
+ /home/david/school/s19/csc471/demRender/src/WindowManager.h
  /home/david/school/s19/csc471/deps/glfw-3.2.1/include/GLFW/glfw3.h
- /home/david/school/s19/csc471/p3.1/src/GLSL.h
- /home/david/school/s19/csc471/p3.1/src/WindowManager.cpp
- /home/david/school/s19/csc471/p3.1/src/WindowManager.h
 CMakeFiles/p3.dir/src/main.cpp.o
  ../ext/glad/include/KHR/khrplatform.h
  ../ext/glad/include/glad/glad.h
  ../ext/tiny_obj_loader/tiny_obj_loader.h
+ /home/david/school/s19/csc471/demRender/src/GLSL.h
+ /home/david/school/s19/csc471/demRender/src/MatrixStack.h
+ /home/david/school/s19/csc471/demRender/src/Program.h
+ /home/david/school/s19/csc471/demRender/src/Shape.h
+ /home/david/school/s19/csc471/demRender/src/WindowManager.h
+ /home/david/school/s19/csc471/demRender/src/main.cpp
+ /home/david/school/s19/csc471/demRender/src/objectDefs.h
+ /home/david/school/s19/csc471/demRender/src/stb_image.h
  /home/david/school/s19/csc471/deps/glfw-3.2.1/include/GLFW/glfw3.h
- /home/david/school/s19/csc471/p3.1/src/GLSL.h
- /home/david/school/s19/csc471/p3.1/src/MatrixStack.h
- /home/david/school/s19/csc471/p3.1/src/Program.h
- /home/david/school/s19/csc471/p3.1/src/Shape.h
- /home/david/school/s19/csc471/p3.1/src/WindowManager.h
- /home/david/school/s19/csc471/p3.1/src/main.cpp
- /home/david/school/s19/csc471/p3.1/src/objectDefs.h
- /home/david/school/s19/csc471/p3.1/src/stb_image.h
 CMakeFiles/p3.dir/src/objectDefs.cpp.o
  ../ext/glad/include/KHR/khrplatform.h
  ../ext/glad/include/glad/glad.h
  ../ext/tiny_obj_loader/tiny_obj_loader.h
+ /home/david/school/s19/csc471/demRender/src/GLSL.h
+ /home/david/school/s19/csc471/demRender/src/MatrixStack.h
+ /home/david/school/s19/csc471/demRender/src/Program.h
+ /home/david/school/s19/csc471/demRender/src/Shape.h
+ /home/david/school/s19/csc471/demRender/src/WindowManager.h
+ /home/david/school/s19/csc471/demRender/src/objectDefs.cpp
+ /home/david/school/s19/csc471/demRender/src/objectDefs.h
+ /home/david/school/s19/csc471/demRender/src/stb_image.h
  /home/david/school/s19/csc471/deps/glfw-3.2.1/include/GLFW/glfw3.h
- /home/david/school/s19/csc471/p3.1/src/GLSL.h
- /home/david/school/s19/csc471/p3.1/src/MatrixStack.h
- /home/david/school/s19/csc471/p3.1/src/Program.h
- /home/david/school/s19/csc471/p3.1/src/Shape.h
- /home/david/school/s19/csc471/p3.1/src/WindowManager.h
- /home/david/school/s19/csc471/p3.1/src/objectDefs.cpp
- /home/david/school/s19/csc471/p3.1/src/objectDefs.h
- /home/david/school/s19/csc471/p3.1/src/stb_image.h
 CMakeFiles/p3.dir/src/tifftest.cpp.o
- /home/david/school/s19/csc471/p3.1/src/tifftest.cpp
+ /home/david/school/s19/csc471/demRender/src/tifftest.cpp

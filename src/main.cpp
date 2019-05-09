@@ -274,20 +274,20 @@ public:
       renderables.push_back((shared_ptr<Renderable>)groundMap);
       
       //tree forest thing: 
-      shared_ptr<LandCover> lc = make_shared<LandCover>();
-      lc->init(
-         vec3(30,-35,0),
-         vec3(-1,1,1),
-         vec3(100,0,-600),
-         vec3(.5,.5,.5),
-         vec3(.7,1.5,.7),
-         vec3(0,0,0),
-         vec3(0,0,0),
-         600,
-         treeShade,
-         resourceDirectory + "/plants/tree.obj"
-      );
-      renderables.push_back((shared_ptr<Renderable>)lc);
+      //shared_ptr<LandCover> lc = make_shared<LandCover>();
+      //lc->init(
+      //   vec3(30,-35,0),
+      //   vec3(-1,1,1),
+      //   vec3(100,0,-600),
+      //   vec3(.5,.5,.5),
+      //   vec3(.7,1.5,.7),
+      //   vec3(0,0,0),
+      //   vec3(0,0,0),
+      //   600,
+      //   treeShade,
+      //   resourceDirectory + "/plants/tree.obj"
+      //);
+      //renderables.push_back((shared_ptr<Renderable>)lc);
 
    }
    //view x,y,z,y rotation,x rotation
