@@ -46,23 +46,24 @@ void GroundMap::generateMap(unsigned char *lcdata,
                             int demwidth, 
                             int demheight){
    //unsigned char seen[width * height] = {};
-   for(unsigned int y = 0; y < lcheight; y++){
-      for(unsigned int x = 0; x < lcwidth; x++){
+   for(unsigned int y = 0; y < lcheight; y+=100){
+      for(unsigned int x = 0; x < lcwidth; x+=100){
          int cindex = x + y * lcheight;
          unsigned char type = lcdata[cindex];
          unsigned char elev = demdata[cindex];
          shared_ptr<LandCover> block = make_shared<LandCover>();
-         //block->init(
-         //   vec3(0,0,0),
-         //   vec3(1,1,1),
-         //   vec3(10,elev,10),
-         //   vec3(0,0,0),
-         //   vec3(0,0,0),
-         //   vec3(0,0,0),
-         //   vec3(0,0,0),
-         //   2,
-         //   model
-         //);
+         block->init(
+            vec3(0,0,0),
+            vec3(-1,1,-1),
+            vec3(0,0,0),
+            vec3(x,elev,y),
+            vec3(1,1,1),
+            vec3(1,1,1),
+            vec3(0,0,0),
+            vec3(0,0,0),
+            1,
+            0
+         );
          blocks.push_back(block);
       }
    }
@@ -70,7 +71,6 @@ void GroundMap::generateMap(unsigned char *lcdata,
 void GroundMap::render(shared_ptr<MatrixStack> Projection,
                   shared_ptr<MatrixStack> View,
                   shared_ptr<MatrixStack> Model){
-   if(true){return;}
    Model->pushMatrix();
    for(int i = 0; i < blocks.size(); i++){
       blocks[i]->render(Projection, View, Model);
@@ -190,14 +190,62 @@ void Topo::render(shared_ptr<MatrixStack> Projection,
 /**********************/
 
 /**********************/
+/* BEGIN LATYPE CLASS */
+/**********************/
+shared_ptr<Program> LandType::shader = make_shared<Program>(); //TODO generalize to all shaders
+vector<shared_ptr<Shape>> LandType::mesh;
+void LandType::getMeshByType(unsigned char type, vector<shared_ptr<Shape>> &meshdestination){
+   meshdestination = LandType::mesh; 
+}
+void LandType::getShaderByType(unsigned char type, shared_ptr<Program> &shaderdestination){
+   shaderdestination = LandType::shader; 
+}
+void LandType::init(){
+   readObj("../resources/plants/tree.obj", mesh); //TODO generalize to all mesh
+   shader = make_shared<Program>();
+	shader->setVerbose(true);
+	shader->setShaderNames("../resources/tree_vert.glsl", "../resources/tree_frag.glsl");
+	shader->init();
+	shader->addUniform("P");
+	shader->addUniform("V");
+	shader->addUniform("M");
+   shader->addUniform("MatDif");
+   shader->addUniform("lightColor");
+   shader->addUniform("MatAmb");
+   shader->addUniform("MatSpec");
+   shader->addUniform("shine");
+   shader->addUniform("lightPos");
+	shader->addAttribute("vertPos");
+	shader->addAttribute("vertNor");
+
+   shader->bind(); //TODO mess with this material def
+   glUniform3f(shader->getUniform("lightColor"), 1, 1,1);
+   glUniform3f(shader->getUniform("lightPos"), 0, 10, 0);
+   glUniform3f(shader->getUniform("MatAmb"), 0.02, .03, 0.02);
+   glUniform3f(shader->getUniform("MatDif"), 0.03, 0.5, 0.01);
+   //glUniform3f(shader->getUniform("MatSpec"), 0.025, 0.025, 0.025);
+   glUniform3f(shader->getUniform("MatSpec"), 0.01, 0.02, 0.01);
+   glUniform1f(shader->getUniform("shine"), .01);
+   shader->unbind();
+
+}
+
+/**********************/
+/*  END LATYPE CLASS  */
+/**********************/
+
+/**********************/
 /* BEGIN LANDCO CLASS */
 /**********************/
-void LandCover::init(glm::vec3 tTrans,   glm::vec3 tScale, glm::vec3 trans, 
+
+
+void LandCover::init(glm::vec3 tTrans,   glm::vec3 tScale, 
+                     glm::vec3 tRot,     glm::vec3 trans, 
                      glm::vec3 minscale, glm::vec3 maxscale, 
                      glm::vec3 minrot,   glm::vec3 maxrot, 
-                     GLfloat n,          unsigned int landType){
-   readObj(objname.c_str(), mesh);
-   shader = shaderin;
+                     GLfloat n,          unsigned char landType){
+   LandType::getMeshByType(landType, mesh);
+   LandType::getShaderByType(landType, shader);
    nchildren = n;
    maxTrans = trans;
    maxRotat = maxrot;
@@ -206,6 +254,7 @@ void LandCover::init(glm::vec3 tTrans,   glm::vec3 tScale, glm::vec3 trans,
    minScale = minscale;
    globalTrans = tTrans;
    globalScale = tScale;
+   globalRotat = tRot;
    fillItems();
 }
 void LandCover::fillItems(){
@@ -234,6 +283,9 @@ void LandCover::render(shared_ptr<MatrixStack> Projection,
    Model->pushMatrix();
       Model->translate(globalTrans);
       Model->scale(globalScale);
+      Model->rotate(globalScale[0], vec3(1,0,0));
+      Model->rotate(globalScale[1], vec3(0,1,0));
+      Model->rotate(globalScale[2], vec3(0,0,1));
       for(unsigned int i = 0; i < items.size(); i++){
          items[i]->render(Model, shader, mesh);
       }
