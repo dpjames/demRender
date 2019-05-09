@@ -7,7 +7,6 @@ FILE(REMOVE_RECURSE
   "CMakeFiles/p3.dir/src/WindowManager.cpp.o"
   "CMakeFiles/p3.dir/src/main.cpp.o"
   "CMakeFiles/p3.dir/src/objectDefs.cpp.o"
-  "CMakeFiles/p3.dir/src/tifftest.cpp.o"
   "CMakeFiles/p3.dir/ext/tiny_obj_loader/tiny_obj_loader.cpp.o"
   "CMakeFiles/p3.dir/ext/glad/src/glad.c.o"
   "p3.pdb"

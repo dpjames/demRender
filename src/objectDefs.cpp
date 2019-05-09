@@ -46,16 +46,20 @@ void GroundMap::generateMap(unsigned char *lcdata,
                             int demwidth, 
                             int demheight){
    //unsigned char seen[width * height] = {};
-   for(unsigned int y = 0; y < lcheight; y+=100){
-      for(unsigned int x = 0; x < lcwidth; x+=100){
+   for(unsigned int y = 0; y < demheight; y+=100){
+      for(unsigned int x = 0; x < demwidth; x+=100){
          int cindex = x + y * lcheight;
+         cout << cindex << endl;
+         cout << lcheight * lcwidth << "," << demheight * demwidth << endl;
          unsigned char type = lcdata[cindex];
          unsigned char elev = demdata[cindex];
          shared_ptr<LandCover> block = make_shared<LandCover>();
+         cout << x << "," << y << endl;
          block->init(
-            vec3(0,0,0),
-            vec3(-1,1,-1),
-            vec3(0,0,0),
+            vec3(500,-40,30),
+            vec3(-1,1,1),
+            vec3(0,M_PI/2,0),
+            vec3(0,elev,0),
             vec3(x,elev,y),
             vec3(1,1,1),
             vec3(1,1,1),
@@ -66,7 +70,9 @@ void GroundMap::generateMap(unsigned char *lcdata,
          );
          blocks.push_back(block);
       }
+      
    }
+   cout << "exit" << endl;
 }
 void GroundMap::render(shared_ptr<MatrixStack> Projection,
                   shared_ptr<MatrixStack> View,
@@ -240,14 +246,15 @@ void LandType::init(){
 
 
 void LandCover::init(glm::vec3 tTrans,   glm::vec3 tScale, 
-                     glm::vec3 tRot,     glm::vec3 trans, 
+                     glm::vec3 tRot,     glm::vec3 mintrans, glm::vec3 maxtrans,
                      glm::vec3 minscale, glm::vec3 maxscale, 
                      glm::vec3 minrot,   glm::vec3 maxrot, 
                      GLfloat n,          unsigned char landType){
    LandType::getMeshByType(landType, mesh);
    LandType::getShaderByType(landType, shader);
    nchildren = n;
-   maxTrans = trans;
+   minTrans = mintrans;
+   maxTrans = maxtrans;
    maxRotat = maxrot;
    minRotat = minrot;
    maxScale = maxscale;
@@ -260,9 +267,9 @@ void LandCover::init(glm::vec3 tTrans,   glm::vec3 tScale,
 void LandCover::fillItems(){
    GLfloat tx,ty,tz,sx,sy,sz,rx,ry,rz;
    for(int i = 0; i < nchildren; i++){
-      tx = maxTrans[0] * (rand() % 100000) / 100000; 
-      ty = maxTrans[1] * (rand() % 100000) / 100000; 
-      tz = maxTrans[2] * (rand() % 100000) / 100000; 
+      tx = minTrans[0] + (maxTrans[0] - minTrans[0]) * (rand() % 100000) / 100000; 
+      ty = minTrans[1] + (maxTrans[1] - minTrans[1]) * (rand() % 100000) / 100000; 
+      tz = minTrans[2] + (maxTrans[2] - minTrans[2]) * (rand() % 100000) / 100000; 
       sx = minScale[0] + (maxScale[0] - minScale[0]) * (rand() % 100000) / 100000;  //+ 1 to allow both directions of scaling with one vector
       sy = minScale[1] + (maxScale[1] - minScale[1]) * (rand() % 100000) / 100000; 
       sz = minScale[2] + (maxScale[2] - minScale[2]) * (rand() % 100000) / 100000; 
@@ -283,9 +290,9 @@ void LandCover::render(shared_ptr<MatrixStack> Projection,
    Model->pushMatrix();
       Model->translate(globalTrans);
       Model->scale(globalScale);
-      Model->rotate(globalScale[0], vec3(1,0,0));
-      Model->rotate(globalScale[1], vec3(0,1,0));
-      Model->rotate(globalScale[2], vec3(0,0,1));
+      Model->rotate(globalRotat[0], vec3(1,0,0));
+      Model->rotate(globalRotat[1], vec3(0,1,0));
+      Model->rotate(globalRotat[2], vec3(0,0,1));
       for(unsigned int i = 0; i < items.size(); i++){
          items[i]->render(Model, shader, mesh);
       }

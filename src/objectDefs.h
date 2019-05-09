@@ -90,6 +90,7 @@ class LandCover : public Renderable {
       GLfloat seperation;
       GLfloat nchildren;
       glm::vec3 maxTrans;
+      glm::vec3 minTrans;
       glm::vec3 maxRotat;
       glm::vec3 minRotat;
       glm::vec3 maxScale;
@@ -103,7 +104,8 @@ class LandCover : public Renderable {
                 glm::vec3 tTrans,
                 glm::vec3 tScale,
                 glm::vec3 tRot,
-                glm::vec3 trans, 
+                glm::vec3 mintrans, 
+                glm::vec3 maxtrans, 
                 glm::vec3 minscale, 
                 glm::vec3 maxscale, 
                 glm::vec3 minrot, 

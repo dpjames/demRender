@@ -18,7 +18,6 @@ SET(CMAKE_DEPENDS_CHECK_CXX
   "/home/dpjames/demRender/src/WindowManager.cpp" "/home/dpjames/demRender/build/CMakeFiles/p3.dir/src/WindowManager.cpp.o"
   "/home/dpjames/demRender/src/main.cpp" "/home/dpjames/demRender/build/CMakeFiles/p3.dir/src/main.cpp.o"
   "/home/dpjames/demRender/src/objectDefs.cpp" "/home/dpjames/demRender/build/CMakeFiles/p3.dir/src/objectDefs.cpp.o"
-  "/home/dpjames/demRender/src/tifftest.cpp" "/home/dpjames/demRender/build/CMakeFiles/p3.dir/src/tifftest.cpp.o"
   )
 SET(CMAKE_CXX_COMPILER_ID "GNU")
 

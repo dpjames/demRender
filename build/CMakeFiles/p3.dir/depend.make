@@ -67,5 +67,3 @@ CMakeFiles/p3.dir/src/objectDefs.cpp.o: ../src/objectDefs.cpp
 CMakeFiles/p3.dir/src/objectDefs.cpp.o: ../src/objectDefs.h
 CMakeFiles/p3.dir/src/objectDefs.cpp.o: ../src/stb_image.h
 
-CMakeFiles/p3.dir/src/tifftest.cpp.o: ../src/tifftest.cpp
-
