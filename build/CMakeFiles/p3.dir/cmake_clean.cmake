@@ -1,4 +1,4 @@
-file(REMOVE_RECURSE
+FILE(REMOVE_RECURSE
   "CMakeFiles/p3.dir/src/GLSL.cpp.o"
   "CMakeFiles/p3.dir/src/MatrixStack.cpp.o"
   "CMakeFiles/p3.dir/src/Program.cpp.o"
@@ -15,6 +15,6 @@ file(REMOVE_RECURSE
 )
 
 # Per-language clean rules from dependency scanning.
-foreach(lang C CXX)
-  include(CMakeFiles/p3.dir/cmake_clean_${lang}.cmake OPTIONAL)
-endforeach()
+FOREACH(lang C CXX)
+  INCLUDE(CMakeFiles/p3.dir/cmake_clean_${lang}.cmake OPTIONAL)
+ENDFOREACH(lang)

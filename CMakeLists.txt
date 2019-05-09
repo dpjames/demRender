@@ -18,8 +18,6 @@ include_directories("ext/glad/include")
 add_executable(${CMAKE_PROJECT_NAME} ${SOURCES} ${HEADERS} ${GLSL})
 
 
-target_link_libraries(${CMAKE_PROJECT_NAME} "gdal")
-
 # Add GLFW
 # Get the GLFW environment variable.
 # There should be a CMakeLists.txt in the specified directory.

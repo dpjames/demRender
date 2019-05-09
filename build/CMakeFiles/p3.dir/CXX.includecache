@@ -1,4 +1,4 @@
-#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
 
 #IncludeRegexScan: ^.*$
 
@@ -66,7 +66,7 @@ sstream
 tiny_obj_loader.h
 ../ext/tiny_obj_loader/tiny_obj_loader.h
 
-/home/david/school/s19/csc471/demRender/ext/tiny_obj_loader/tiny_obj_loader.cpp
+/home/dpjames/demRender/ext/tiny_obj_loader/tiny_obj_loader.cpp
 cstdlib
 -
 cstring
@@ -90,9 +90,9 @@ fstream
 sstream
 -
 tiny_obj_loader.h
-/home/david/school/s19/csc471/demRender/ext/tiny_obj_loader/tiny_obj_loader.h
+/home/dpjames/demRender/ext/tiny_obj_loader/tiny_obj_loader.h
 
-/home/david/school/s19/csc471/demRender/ext/tiny_obj_loader/tiny_obj_loader.h
+/home/dpjames/demRender/ext/tiny_obj_loader/tiny_obj_loader.h
 string
 -
 vector
@@ -122,11 +122,11 @@ fstream
 sstream
 -
 tiny_obj_loader.h
-/home/david/school/s19/csc471/demRender/ext/tiny_obj_loader/tiny_obj_loader.h
+/home/dpjames/demRender/ext/tiny_obj_loader/tiny_obj_loader.h
 
-/home/david/school/s19/csc471/demRender/src/GLSL.cpp
+/home/dpjames/demRender/src/GLSL.cpp
 GLSL.h
-/home/david/school/s19/csc471/demRender/src/GLSL.h
+/home/dpjames/demRender/src/GLSL.h
 stdio.h
 -
 stdlib.h
@@ -138,35 +138,35 @@ cstring
 cassert
 -
 
-/home/david/school/s19/csc471/demRender/src/GLSL.h
+/home/dpjames/demRender/src/GLSL.h
 glad/glad.h
 -
 string
 -
 
-/home/david/school/s19/csc471/demRender/src/MatrixStack.cpp
+/home/dpjames/demRender/src/MatrixStack.cpp
 MatrixStack.h
-/home/david/school/s19/csc471/demRender/src/MatrixStack.h
+/home/dpjames/demRender/src/MatrixStack.h
 glm/gtc/matrix_transform.hpp
 -
 
-/home/david/school/s19/csc471/demRender/src/MatrixStack.h
+/home/dpjames/demRender/src/MatrixStack.h
 stack
 -
 memory
 -
 glm/glm.hpp
-/home/david/school/s19/csc471/demRender/src/glm/glm.hpp
+/home/dpjames/demRender/src/glm/glm.hpp
 glm/vec4.hpp
-/home/david/school/s19/csc471/demRender/src/glm/vec4.hpp
+/home/dpjames/demRender/src/glm/vec4.hpp
 glm/mat4x4.hpp
-/home/david/school/s19/csc471/demRender/src/glm/mat4x4.hpp
+/home/dpjames/demRender/src/glm/mat4x4.hpp
 glm/gtc/matrix_transform.hpp
-/home/david/school/s19/csc471/demRender/src/glm/gtc/matrix_transform.hpp
+/home/dpjames/demRender/src/glm/gtc/matrix_transform.hpp
 
-/home/david/school/s19/csc471/demRender/src/Program.cpp
+/home/dpjames/demRender/src/Program.cpp
 Program.h
-/home/david/school/s19/csc471/demRender/src/Program.h
+/home/dpjames/demRender/src/Program.h
 iostream
 -
 cassert
@@ -174,9 +174,9 @@ cassert
 fstream
 -
 GLSL.h
-/home/david/school/s19/csc471/demRender/src/GLSL.h
+/home/dpjames/demRender/src/GLSL.h
 
-/home/david/school/s19/csc471/demRender/src/Program.h
+/home/dpjames/demRender/src/Program.h
 map
 -
 string
@@ -184,19 +184,19 @@ string
 glad/glad.h
 -
 
-/home/david/school/s19/csc471/demRender/src/Shape.cpp
+/home/dpjames/demRender/src/Shape.cpp
 Shape.h
-/home/david/school/s19/csc471/demRender/src/Shape.h
+/home/dpjames/demRender/src/Shape.h
 iostream
 -
 assert.h
 -
 GLSL.h
-/home/david/school/s19/csc471/demRender/src/GLSL.h
+/home/dpjames/demRender/src/GLSL.h
 Program.h
-/home/david/school/s19/csc471/demRender/src/Program.h
+/home/dpjames/demRender/src/Program.h
 
-/home/david/school/s19/csc471/demRender/src/Shape.h
+/home/dpjames/demRender/src/Shape.h
 string
 -
 vector
@@ -208,11 +208,11 @@ glm/gtc/type_ptr.hpp
 tiny_obj_loader/tiny_obj_loader.h
 -
 
-/home/david/school/s19/csc471/demRender/src/Texture.cpp
+/home/dpjames/demRender/src/Texture.cpp
 Texture.h
-/home/david/school/s19/csc471/demRender/src/Texture.h
+/home/dpjames/demRender/src/Texture.h
 GLSL.h
-/home/david/school/s19/csc471/demRender/src/GLSL.h
+/home/dpjames/demRender/src/GLSL.h
 stdio.h
 -
 stdlib.h
@@ -220,29 +220,29 @@ stdlib.h
 iostream
 -
 stb_image.h
-/home/david/school/s19/csc471/demRender/src/stb_image.h
+/home/dpjames/demRender/src/stb_image.h
 
-/home/david/school/s19/csc471/demRender/src/Texture.h
+/home/dpjames/demRender/src/Texture.h
 glad/glad.h
 -
 string
 -
 
-/home/david/school/s19/csc471/demRender/src/WindowManager.cpp
+/home/dpjames/demRender/src/WindowManager.cpp
 WindowManager.h
-/home/david/school/s19/csc471/demRender/src/WindowManager.h
+/home/dpjames/demRender/src/WindowManager.h
 GLSL.h
-/home/david/school/s19/csc471/demRender/src/GLSL.h
+/home/dpjames/demRender/src/GLSL.h
 iostream
 -
 
-/home/david/school/s19/csc471/demRender/src/WindowManager.h
+/home/dpjames/demRender/src/WindowManager.h
 glad/glad.h
 -
 GLFW/glfw3.h
 -
 
-/home/david/school/s19/csc471/demRender/src/main.cpp
+/home/dpjames/demRender/src/main.cpp
 fstream
 -
 iostream
@@ -252,15 +252,15 @@ glad/glad.h
 math.h
 -
 GLSL.h
-/home/david/school/s19/csc471/demRender/src/GLSL.h
+/home/dpjames/demRender/src/GLSL.h
 Program.h
-/home/david/school/s19/csc471/demRender/src/Program.h
+/home/dpjames/demRender/src/Program.h
 Shape.h
-/home/david/school/s19/csc471/demRender/src/Shape.h
+/home/dpjames/demRender/src/Shape.h
 MatrixStack.h
-/home/david/school/s19/csc471/demRender/src/MatrixStack.h
+/home/dpjames/demRender/src/MatrixStack.h
 WindowManager.h
-/home/david/school/s19/csc471/demRender/src/WindowManager.h
+/home/dpjames/demRender/src/WindowManager.h
 tiny_obj_loader/tiny_obj_loader.h
 -
 glm/gtc/type_ptr.hpp
@@ -268,15 +268,15 @@ glm/gtc/type_ptr.hpp
 glm/gtc/matrix_transform.hpp
 -
 stb_image.h
-/home/david/school/s19/csc471/demRender/src/stb_image.h
+/home/dpjames/demRender/src/stb_image.h
 objectDefs.h
-/home/david/school/s19/csc471/demRender/src/objectDefs.h
+/home/dpjames/demRender/src/objectDefs.h
 
-/home/david/school/s19/csc471/demRender/src/objectDefs.cpp
+/home/dpjames/demRender/src/objectDefs.cpp
 objectDefs.h
-/home/david/school/s19/csc471/demRender/src/objectDefs.h
+/home/dpjames/demRender/src/objectDefs.h
 
-/home/david/school/s19/csc471/demRender/src/objectDefs.h
+/home/dpjames/demRender/src/objectDefs.h
 fstream
 -
 iostream
@@ -286,15 +286,15 @@ glad/glad.h
 math.h
 -
 GLSL.h
-/home/david/school/s19/csc471/demRender/src/GLSL.h
+/home/dpjames/demRender/src/GLSL.h
 Program.h
-/home/david/school/s19/csc471/demRender/src/Program.h
+/home/dpjames/demRender/src/Program.h
 Shape.h
-/home/david/school/s19/csc471/demRender/src/Shape.h
+/home/dpjames/demRender/src/Shape.h
 MatrixStack.h
-/home/david/school/s19/csc471/demRender/src/MatrixStack.h
+/home/dpjames/demRender/src/MatrixStack.h
 WindowManager.h
-/home/david/school/s19/csc471/demRender/src/WindowManager.h
+/home/dpjames/demRender/src/WindowManager.h
 tiny_obj_loader/tiny_obj_loader.h
 -
 glm/gtc/type_ptr.hpp
@@ -302,11 +302,11 @@ glm/gtc/type_ptr.hpp
 glm/gtc/matrix_transform.hpp
 -
 stb_image.h
-/home/david/school/s19/csc471/demRender/src/stb_image.h
+/home/dpjames/demRender/src/stb_image.h
 
-/home/david/school/s19/csc471/demRender/src/stb_image.h
+/home/dpjames/demRender/src/stb_image.h
 stb_image.h
-/home/david/school/s19/csc471/demRender/src/stb_image.h
+/home/dpjames/demRender/src/stb_image.h
 stdio.h
 -
 stdarg.h
@@ -332,7 +332,7 @@ intrin.h
 arm_neon.h
 -
 
-/home/david/school/s19/csc471/demRender/src/tifftest.cpp
+/home/dpjames/demRender/src/tifftest.cpp
 iostream
 -
 vector
@@ -340,45 +340,5 @@ vector
 gdal/gdal_priv.h
 -
 gdal/cpl_conv.h
--
-
-/home/david/school/s19/csc471/deps/glfw-3.2.1/include/GLFW/glfw3.h
-stddef.h
--
-stdint.h
--
-OpenGL/gl3.h
--
-OpenGL/gl3ext.h
--
-OpenGL/gl.h
--
-OpenGL/glu.h
--
-GL/glcorearb.h
--
-GLES/gl.h
--
-GLES/glext.h
--
-GLES2/gl2.h
--
-GLES2/gl2ext.h
--
-GLES3/gl3.h
--
-GLES2/gl2ext.h
--
-GLES3/gl31.h
--
-GLES2/gl2ext.h
--
-vulkan/vulkan.h
--
-GL/gl.h
--
-GL/glext.h
--
-GL/glu.h
 -
 
