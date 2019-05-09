@@ -96,11 +96,13 @@ class LandCover : public Renderable {
       glm::vec3 minScale;
       glm::vec3 globalTrans;
       glm::vec3 globalScale;
+      glm::vec3 globalRotat;
       void fillItems();
    public :
       void init(
                 glm::vec3 tTrans,
                 glm::vec3 tScale,
+                glm::vec3 tRot,
                 glm::vec3 trans, 
                 glm::vec3 minscale, 
                 glm::vec3 maxscale, 
@@ -126,5 +128,16 @@ class GroundMap : public Renderable {
       void render(shared_ptr<MatrixStack> Projection,
                   shared_ptr<MatrixStack> View,
                   shared_ptr<MatrixStack> Model);
+};
+
+
+class LandType {
+   private :
+      static vector<shared_ptr<Shape>> mesh;
+      static shared_ptr<Program> shader;
+   public :
+      static void getMeshByType(unsigned char type,   vector<shared_ptr<Shape>> &mesh);
+      static void getShaderByType(unsigned char type, shared_ptr<Program> &shader);
+      static void init();
 };
 #endif

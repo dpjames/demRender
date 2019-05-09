@@ -262,6 +262,7 @@ public:
       treeShade->unbind();
 
 
+      LandType::init(); //TODO pass in resource dir
 	}
    GLfloat LY = 10;
 	void initSceneObjects(const std::string& resourceDirectory){
@@ -377,7 +378,7 @@ int main(int argc, char *argv[])
 
 	// This is the code that will likely change program to program as you
 	// may need to initialize or set up different data and state
-
+   
 	application->init(resourceDir);
 	//application->initGeom(resourceDir);
 
