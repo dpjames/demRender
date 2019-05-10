@@ -1,12 +1,19 @@
 #include "objectDefs.h"
-using namespace std;
-using namespace glm;
+using std::cout;
+using std::endl;
+using std::vector;
+using std::shared_ptr;
+using std::make_shared;
+using std::min;
+
+using glm::vec4;
+using glm::length;
 
 void readJPG(string filename, unsigned char*& data, int *width, int *height, int *n){
    cout << "reading " << filename << endl;
    data = stbi_load(filename.c_str(), width, height, n, 1);
    if(data == NULL){
-      perror("NULL??"); //TODO better error cmon;
+      perror(filename.c_str()); //TODO better error cmon;
       return;
    }
 }
@@ -16,7 +23,7 @@ void readObj(string fname, vector<shared_ptr<Shape>> &mesh){
    string e;
    bool rcc = tinyobj::LoadObj(tss, omm, e, fname.c_str());
    if(!rcc){
-      cerr << e << endl;
+      cout << e << endl;
    } else {
       for(unsigned int i = 0; i < tss.size(); i++){
          shared_ptr<Shape> s = make_shared<Shape>();
@@ -45,28 +52,36 @@ void GroundMap::generateMap(unsigned char *lcdata,
                             int lcheight, 
                             int demwidth, 
                             int demheight){
+   int DY = 10;
+   int DX = 10;
    //unsigned char seen[width * height] = {};
-   for(unsigned int y = 0; y < demheight; y+=100){
-      for(unsigned int x = 0; x < demwidth; x+=100){
-         int cindex = x + y * lcheight;
-         cout << cindex << endl;
-         cout << lcheight * lcwidth << "," << demheight * demwidth << endl;
-         unsigned char type = lcdata[cindex];
-         unsigned char elev = demdata[cindex];
+   cout << demheight << "x" << demwidth << endl; 
+   cout << lcheight << "x" << lcwidth << endl; 
+   for(unsigned int y = 0; y < lcheight; y+=DY){
+      for(unsigned int x = 0; x < lcwidth; x+=DX){
+         float wx = (x / (float)lcwidth) * demwidth;
+         float wy = (y / (float)lcheight) * demheight;
+         int lcindex = x + y * lcwidth;
+         int demindex = wx + wy * demwidth;
+         unsigned char type = lcdata[lcindex];
+         unsigned char elev = demdata[demindex];
          shared_ptr<LandCover> block = make_shared<LandCover>();
-         cout << x << "," << y << endl;
          block->init(
-            vec3(500,-40,30),
-            vec3(-1,1,1),
-            vec3(0,M_PI/2,0),
-            vec3(0,elev,0),
-            vec3(x,elev,y),
+            vec3(0,0,0),
             vec3(1,1,1),
-            vec3(1,1,1),
+            vec3(0,0,0),
+            vec3(wx-DX/2,0,wy-DY/2),
+            vec3(wx+DX/2,0,wy+DX/2),
+            vec3(.5,.5,.5),
+            vec3(.5,1,.5),
             vec3(0,0,0),
             vec3(0,0,0),
             1,
-            0
+            type,
+            demdata,
+            demwidth,
+            demheight,
+            wx,wy
          );
          blocks.push_back(block);
       }
@@ -79,7 +94,9 @@ void GroundMap::render(shared_ptr<MatrixStack> Projection,
                   shared_ptr<MatrixStack> Model){
    Model->pushMatrix();
    for(int i = 0; i < blocks.size(); i++){
-      blocks[i]->render(Projection, View, Model);
+      if(length(blocks[i]->getPosition() + State::viewPosition) < 300){
+         blocks[i]->render(Projection, View, Model);
+      }
    }
    Model->popMatrix();
 }
@@ -107,19 +124,19 @@ void Topo::insertPoint(float minz, float maxz, unsigned char *data, unsigned int
    float z = data[x + y * width];
    float zper = (z - minz) / (maxz-minz);
    topoVertex.push_back(x);
-   topoVertex.push_back(y);
    topoVertex.push_back(z);
+   topoVertex.push_back(y);
    //fun colors based on depth and things.
    topoColor.push_back(1 - (y / (float) height));
-   topoColor.push_back(1 - zper);
    topoColor.push_back(1 - x / (float)width);
+   topoColor.push_back(1 - zper);
 }
 /*
  * use the image data pointer and the width/height to fill topoColor and topoVertex
  */
 void Topo::fillTopoArrays(unsigned char *data, unsigned int width, unsigned int height){
    //topoVertex 
-   float scale = 4; //TODO make this passed in by init
+   float scale = 10; //TODO make this passed in by init
    float minZ = data[0];
    float maxZ = data[0];
    //find a scale for the height data. This is usually 0-255, but could change to lager ranges in the future
@@ -173,13 +190,7 @@ void Topo::init(string filename, shared_ptr<Program> p){
 void Topo::render(shared_ptr<MatrixStack> Projection,
                   shared_ptr<MatrixStack> View,
                   shared_ptr<MatrixStack> Model){
-   //TODO fix this here!!
-   Model->scale(vec3(-1, 1, 1)); //TODO remove neg
    Model->pushMatrix();
-   Model->translate(vec3(500,-40,30));
-   Model->rotate(M_PI/2, vec3(0,1,0)); 
-   Model->rotate(M_PI/-2, vec3(1,0,0));
-
    prog->bind();
    glUniformMatrix4fv(prog->getUniform("P"), 1, GL_FALSE, value_ptr(Projection->topMatrix()));
    glUniformMatrix4fv(prog->getUniform("V"), 1, GL_FALSE, value_ptr(View->topMatrix()));
@@ -201,7 +212,11 @@ void Topo::render(shared_ptr<MatrixStack> Projection,
 shared_ptr<Program> LandType::shader = make_shared<Program>(); //TODO generalize to all shaders
 vector<shared_ptr<Shape>> LandType::mesh;
 void LandType::getMeshByType(unsigned char type, vector<shared_ptr<Shape>> &meshdestination){
-   meshdestination = LandType::mesh; 
+   if(type == 41 || type == 42 || type == 43){
+      meshdestination = LandType::mesh; 
+   } else {
+
+   }
 }
 void LandType::getShaderByType(unsigned char type, shared_ptr<Program> &shaderdestination){
    shaderdestination = LandType::shader; 
@@ -245,11 +260,14 @@ void LandType::init(){
 /**********************/
 
 
-void LandCover::init(glm::vec3 tTrans,   glm::vec3 tScale, 
-                     glm::vec3 tRot,     glm::vec3 mintrans, glm::vec3 maxtrans,
-                     glm::vec3 minscale, glm::vec3 maxscale, 
-                     glm::vec3 minrot,   glm::vec3 maxrot, 
-                     GLfloat n,          unsigned char landType){
+void LandCover::init(vec3 tTrans,          vec3 tScale, 
+                     vec3 tRot,            vec3 mintrans, vec3 maxtrans,
+                     vec3 minscale,        vec3 maxscale, 
+                     vec3 minrot,          vec3 maxrot, 
+                     GLfloat n,            unsigned char landType,
+                     unsigned char *elev,  unsigned int ewidth,
+                     unsigned int eheight, unsigned int originx, 
+                     unsigned int originy){
    LandType::getMeshByType(landType, mesh);
    LandType::getShaderByType(landType, shader);
    nchildren = n;
@@ -262,14 +280,33 @@ void LandCover::init(glm::vec3 tTrans,   glm::vec3 tScale,
    globalTrans = tTrans;
    globalScale = tScale;
    globalRotat = tRot;
-   fillItems();
+   fillItems(elev, ewidth, eheight, originx, originy);
 }
-void LandCover::fillItems(){
+vec3 LandCover::getPosition(){
+   return minTrans;
+}
+void LandCover::fillItems(unsigned char *elev, unsigned int width, unsigned int height, unsigned int originx, unsigned int originy){
    GLfloat tx,ty,tz,sx,sy,sz,rx,ry,rz;
    for(int i = 0; i < nchildren; i++){
       tx = minTrans[0] + (maxTrans[0] - minTrans[0]) * (rand() % 100000) / 100000; 
-      ty = minTrans[1] + (maxTrans[1] - minTrans[1]) * (rand() % 100000) / 100000; 
       tz = minTrans[2] + (maxTrans[2] - minTrans[2]) * (rand() % 100000) / 100000; 
+      if(tx < 0){
+         tx = 0;
+      }
+      if(tx > width - 1){
+         tx = width - 1;
+      }
+      if(tz < 0){
+         tz = 0;
+      }
+      if(tz > height - 1){
+         tz = height - 1;
+      }
+      if((int)tx + (int)tz * width > width * height){
+         cout << "oh no" << endl;
+      }
+      ty = elev[(int)tx + (int)tz * width];
+      ty = 1 * ty;
       sx = minScale[0] + (maxScale[0] - minScale[0]) * (rand() % 100000) / 100000;  //+ 1 to allow both directions of scaling with one vector
       sy = minScale[1] + (maxScale[1] - minScale[1]) * (rand() % 100000) / 100000; 
       sz = minScale[2] + (maxScale[2] - minScale[2]) * (rand() % 100000) / 100000; 
@@ -307,7 +344,7 @@ void LandCover::render(shared_ptr<MatrixStack> Projection,
 /**********************/
 /* BEGIN COVER  CLASS */
 /**********************/
-void Cover::init(glm::vec3 t, glm::vec3 s, glm::vec3 r){
+void Cover::init(vec3 t, vec3 s, vec3 r){
    trans = t;
    scale = s;
    rotat = r;
@@ -321,13 +358,27 @@ void Cover::render(shared_ptr<MatrixStack> Model,
       Model->rotate(rotat[0], vec3(1,0,0));
       Model->rotate(rotat[1], vec3(0,1,0));
       Model->rotate(rotat[2], vec3(0,0,1));
-      glUniformMatrix4fv(shader->getUniform("M"), 1, GL_FALSE, value_ptr(Model->topMatrix()));
-      for(unsigned int i = 0; i < mesh.size(); i++){
-         mesh[i]->draw(shader);
+      if(true || distance((vec3)Model->topMatrix()[3], -1.0f * State::viewPosition) <= 100 * State::scaler){
+         glUniformMatrix4fv(shader->getUniform("M"), 1, GL_FALSE, value_ptr(Model->topMatrix()));
+         for(unsigned int i = 0; i < mesh.size(); i++){
+            mesh[i]->draw(shader);
+         }
       }
    Model->popMatrix();
 
 }
 /**********************/
 /*  END COVER  CLASS  */
+/**********************/
+
+
+
+/**********************/
+/* Begin State CLASS  */
+/**********************/
+vec3 State::viewPosition = vec3(0,-13,-535);
+vec3 State::viewRotation = vec3(0,M_PI/2,0);
+float State::scaler = 1;
+/**********************/
+/*  END State  CLASS  */
 /**********************/
