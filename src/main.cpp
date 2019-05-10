@@ -46,30 +46,7 @@ public:
    vector<shared_ptr<Renderable>> renderables;
    vector<shared_ptr<Updateable>> updateables;
 
-	void createPerspectiveMat(float *m, float fovy, float aspect, float zNear, float zFar)
-	{
-   // http://www-01.ibm.com/support/knowledgecenter/ssw_aix_61/com.ibm.aix.opengl/doc/openglrf/gluPerspective.htm%23b5c8872587rree
-		float f = 1.0f/glm::tan(0.5f*fovy);
-		m[ 0] = f/aspect;
-		m[ 1] = 0.0f;
-		m[ 2] = 0.0f;
-		m[ 3] = 0.0f;
-		m[ 4] = 0;
-		m[ 5] = f;
-		m[ 6] = 0.0f;
-		m[ 7] = 0.0f;
-		m[ 8] = 0.0f;
-		m[ 9] = 0.0f;
-		m[10] = (zFar + zNear)/(zNear - zFar);
-		m[11] = -1.0f;
-		m[12] = 0.0f;
-		m[13] = 0.0f;
-		m[14] = 2.0f*zFar*zNear/(zNear - zFar);
-		m[15] = 0.0f;
-	}
-   
    float moveDir[6] = {0,0,0,0,0,0}; //x,y,z,zrot,yrot,rot
-   float scaler = 1;
 
    /*
     * escape - closes application
@@ -92,7 +69,7 @@ public:
 	{
       float delta = .1;
       if(key == GLFW_KEY_L && action == GLFW_PRESS){
-         cout << VX << "," << VY << "," << VZ << endl;
+         cout << State::viewPosition[0] << "," << State::viewPosition[1] << "," << State::viewPosition[2] << endl;
       }
 		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		{
@@ -105,10 +82,10 @@ public:
 			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 		}
 		if (key == GLFW_KEY_O && action == GLFW_RELEASE) {
-         scaler*=2;
+         State::scaler*=2;
 		}
 		if (key == GLFW_KEY_I && action == GLFW_RELEASE) {
-         scaler/=2;
+         State::scaler/=2;
 		}
       //WASD
       if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
@@ -175,11 +152,8 @@ public:
       }
 
       if(key == GLFW_KEY_R && action == GLFW_PRESS){
-         VX = 0;
-         VY = 0;
-         VZ = 0;
-         VXROT = 0;
-         VYROT = 0;
+         State::viewPosition = vec3(0,0,0);
+         State::viewRotation = vec3(0,0,0);
       }
 
       if(key == GLFW_KEY_Y && action == GLFW_PRESS){
@@ -208,7 +182,6 @@ public:
 		{
 			glfwGetCursorPos(window, &posX, &posY);
 			cout << "Pos X " << posX <<  " Pos Y " << posY << endl;
-         VZ++;
 		}
 	}
 	void resizeCallback(GLFWwindow *window, int width, int height)
@@ -274,33 +247,7 @@ public:
       groundMap->init(resourceDirectory + "/landcover.jpg", resourceDirectory + "/topo.jpg");
       renderables.push_back((shared_ptr<Renderable>)groundMap);
       
-      //tree forest thing: 
-      //shared_ptr<LandCover> lc = make_shared<LandCover>();
-      //lc->init(
-      //   vec3(30,-35,0),
-      //   vec3(-1,1,1),
-      //   vec3(100,0,-600),
-      //   vec3(.5,.5,.5),
-      //   vec3(.7,1.5,.7),
-      //   vec3(0,0,0),
-      //   vec3(0,0,0),
-      //   600,
-      //   treeShade,
-      //   resourceDirectory + "/plants/tree.obj"
-      //);
-      //renderables.push_back((shared_ptr<Renderable>)lc);
-
    }
-   //view x,y,z,y rotation,x rotation
-   float VX = 0;    
-   float VY = 0;
-   float VZ = 0; 
-   float VYROT = 0;
-   float VXROT = 0;
-   //scale the trees to make them dance
-   float treeScale = 1;
-   //rotate the bynny to make it fly in circles
-   float bunnyRot = 0;
    /*
     *
     */
@@ -308,26 +255,30 @@ public:
    //updates the above variables according to how much time has passed since the last update.
    void moveView(double dt){
       dt*=1000;
+      vec3 curViewPos = State::viewPosition;
+      vec3 viewPosMod = vec3(0,0,0);
+      vec3 curViewRot = State::viewRotation;
+      vec3 viewRotMod = vec3(0,0,0);
       if(moveDir[0] != 0){
-         VX-=dt*moveDir[0];
+         viewPosMod[0] = -1*dt*moveDir[0];
       }
       if(moveDir[1] != 0){
-         VY-=dt*moveDir[1];
+         viewPosMod[1] = -1 * dt *moveDir[1];
       }
       if(moveDir[2] != 0){
-         VZ-=dt*moveDir[2];
+         viewPosMod[2] =-1*dt*moveDir[2];
       }
       if(moveDir[3] != 0){
-         VXROT+=dt*moveDir[3]/100;
+         viewRotMod[0]=dt*moveDir[3]/100;
       }
       if(moveDir[4] != 0){
-         VYROT+=dt*moveDir[4]/100;
+         viewRotMod[1]+=dt*moveDir[4]/100;
       }
       if(moveDir[5] != 0){
          
       }
-      treeScale+=dt/500;
-      bunnyRot+=dt/100;
+      State::viewPosition+=viewPosMod;
+      State::viewRotation+=viewRotMod;
    }
 	void render()
 	{
@@ -344,12 +295,12 @@ public:
       Projection->perspective(45.0f, aspect, 0.01f, 100000.0f);
       View->pushMatrix();
       View->loadIdentity();
-      View->rotate(VXROT, vec3(1,0,0));
-      View->rotate(VYROT, vec3(0,1,0));
-      View->translate(vec3(VX,VY,VZ));
+      View->rotate(State::viewRotation[0], vec3(1,0,0));
+      View->rotate(State::viewRotation[1], vec3(0,1,0));
+      View->translate(State::viewPosition);
       Model->pushMatrix();
          Model->loadIdentity();
-         Model->scale(vec3(scaler, scaler, scaler)); //TODO remove neg
+         Model->scale(vec3(State::scaler, State::scaler, State::scaler)); //TODO remove neg
          for(unsigned int i = 0; i < renderables.size(); i++){
             renderables[i]->render(Projection,View,Model);
          }

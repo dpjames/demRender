@@ -19,6 +19,7 @@
 using std::vector;
 using std::shared_ptr;
 using std::string;
+using glm::vec3;
 
 class Renderable {
    public :
@@ -98,7 +99,8 @@ class LandCover : public Renderable {
       glm::vec3 globalTrans;
       glm::vec3 globalScale;
       glm::vec3 globalRotat;
-      void fillItems();
+      void fillItems(unsigned char *elev, unsigned int width, unsigned int height,
+                     unsigned int originx, unsigned int originy);
    public :
       void init(
                 glm::vec3 tTrans,
@@ -110,11 +112,18 @@ class LandCover : public Renderable {
                 glm::vec3 maxscale, 
                 glm::vec3 minrot, 
                 glm::vec3 maxrot, 
-                GLfloat n, 
-                unsigned char landType);
+                GLfloat n,
+                unsigned char landType,
+                unsigned char *elev,
+                unsigned int ewidth,
+                unsigned int eheight,
+                unsigned int originx,
+                unsigned int originy);
+
       void render(shared_ptr<MatrixStack> Projection,
                   shared_ptr<MatrixStack> View,
                   shared_ptr<MatrixStack> Model);
+      vec3 getPosition();
 };
 class GroundMap : public Renderable {
    private :
@@ -141,5 +150,13 @@ class LandType {
       static void getMeshByType(unsigned char type,   vector<shared_ptr<Shape>> &mesh);
       static void getShaderByType(unsigned char type, shared_ptr<Program> &shader);
       static void init();
+};
+
+
+class State {
+   public :
+      static vec3 viewPosition;
+      static vec3 viewRotation;
+      static float scaler;
 };
 #endif
