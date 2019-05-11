@@ -34,7 +34,7 @@ void setMaterial(shared_ptr<Program> p, int material){
          glUniform1f(p->getUniform("shine"), 27.9);
          break;
       case TREE_MATERIAL: //tree
-         glUniform3f(p->getUniform("MatAmb"), 0.02, .03, 0.02);
+         glUniform3f(p->getUniform("MatAmb"), 0.2, .3, 0.2);
          glUniform3f(p->getUniform("MatDif"), 0.03, 0.5, 0.01);
          glUniform3f(p->getUniform("MatSpec"), 0.01, 0.02, 0.01);
          glUniform1f(p->getUniform("shine"), .01);
@@ -45,9 +45,10 @@ void setMaterial(shared_ptr<Program> p, int material){
 
 void readJPG(string filename, unsigned char*& data, int *width, int *height, int *n){
    cout << "reading " << filename << endl;
+	stbi_set_flip_vertically_on_load(false);
    data = stbi_load(filename.c_str(), width, height, n, 1);
    if(data == NULL){
-      perror(filename.c_str()); //TODO better error cmon;
+      perror(filename.c_str()); 
       return;
    }
 }
@@ -153,13 +154,13 @@ void Topo::readTopo(string filename){
  * (the x, y and z axis are flipped around currently)
  */
 void Topo::insertPoint(float minz, float maxz, unsigned char *data, unsigned int x, unsigned int y, unsigned int width, unsigned int height){
-   float z = data[x + y * width];
-   float zper = (z - minz) / (maxz-minz);
+   float z = data[x + y * width] * State::zscale;
    topoVertex.push_back(x);
    topoVertex.push_back(z);
    topoVertex.push_back(y);
 }
 void Topo::generateNormals(){
+   cout << "generating normals" << endl;
    vector<GLfloat> normals(topoVertex.size(),0); 
    for(int i = 0; i < topoVertex.size(); i+=9){
       vec3 p1 = vec3(topoVertex[i+0], topoVertex[i+1], topoVertex[i+2]);
@@ -178,8 +179,11 @@ void Topo::generateNormals(){
       normals[i + 7]+=normal[1];
       normals[i + 8]+=normal[2];
    }
-   cout << "+++" << endl;
+   int per5 = normals.size() * .05;
    for(int i = 0; i < normals.size(); i+=3){
+      if(i % per5 == 0){
+         cout << (float)i / normals.size() * 100 << "%" << endl;
+      }
       vec3 normalized = glm::normalize(vec3(normals[i+0], normals[i+1], normals[i+2]));
       normals[i + 0] = normalized[0];
       normals[i + 1] = normalized[1];
@@ -192,7 +196,7 @@ void Topo::generateNormals(){
  */
 void Topo::fillTopoArrays(unsigned char *data, unsigned int width, unsigned int height){
    //topoVertex 
-   float scale = 10; //TODO make this passed in by init
+   float scale = 3; //TODO make this passed in by init
    float minZ = data[0];
    float maxZ = data[0];
    //find a scale for the height data. This is usually 0-255, but could change to lager ranges in the future
@@ -207,7 +211,6 @@ void Topo::fillTopoArrays(unsigned char *data, unsigned int width, unsigned int 
    }
    for(unsigned int y = 0; y < height - scale; y+=scale){
       for(unsigned int x = 0; x < width; x+=scale){
-         //TODO calculate texture point mapping. update colorArray to this instead
          if(x + scale < width){
             insertPoint(minZ,maxZ, data, x, y, width,height);
             insertPoint(minZ,maxZ, data, x, y + scale, width,height);
@@ -237,12 +240,26 @@ void Topo::fillTopoArrays(unsigned char *data, unsigned int width, unsigned int 
    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * topoNormals.size(), topoNormals.data(), GL_DYNAMIC_DRAW);
    glEnableVertexAttribArray(1);
    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
+
+   createTexture(); 
+
    //bind null
    glBindVertexArray(0);
 }
 void Topo::init(string filename){
    readTopo(filename);
    createShader();
+}
+void Topo::createTexture(){
+   Texture t;
+   t.setFilename("../resources/topo.tex.jpg"); //TODO pass in
+   t.init();
+   //unsigned char* dataunscale, data;
+   //int width;
+   //int height;
+   //int n;
+   //readJPG("../resources/topo.tex.PNG", dataunscale, &width, &height, &n);
+   //glTexImage2D(GL_TEXTURE_2D, 0, n, width * sizeof(unsigned char), height * sizeof(unsigned char), 0, GL_RGB, GL_UNSIGNED_BYTE, data); 
 }
 void Topo::createShader(){
    shader = make_shared<Program>();
@@ -314,7 +331,13 @@ void LandType::init(){
    shader->addUniform("lightPos");
    shader->addAttribute("vertPos");
    shader->addAttribute("vertNor");
+   shader->addAttribute("vertTex");
    setMaterial(shader, TREE_MATERIAL);
+   shader->bind();
+   Texture t;
+   t.setFilename("../resources/plants/tree.tex.jpg");
+   t.init();
+   shader->unbind();
 }
 
 /**********************/
@@ -445,12 +468,14 @@ vec3 State::viewPosition = vec3(0,-13,-535);
 vec3 State::viewRotation = vec3(0,M_PI/2,0);
 vec3 State::lightPos = vec3(0,13,535);
 vec3 State::lightCol = vec3(1,1,1);
+GLfloat State::zscale = 1;
 float State::scaler = 1;
 void State::reset(){
    State::viewPosition = vec3(0,-13,-535);
    State::viewRotation = vec3(0,M_PI/2,0);
    State::lightPos = vec3(0,13,535);
    State::lightCol = vec3(1,1,1);
+   State::zscale = 1;
 }
 /**********************/
 /*  END State  CLASS  */
