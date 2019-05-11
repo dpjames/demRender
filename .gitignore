@@ -1,1 +1,9 @@
 build
+src/demRender.vcxproj
+src/demRender.vcxproj.user
+demRender.sln
+CmakeLists.txt
+.vs
+x64
+src/x64
+
