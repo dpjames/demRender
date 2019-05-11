@@ -1,6 +1,6 @@
 #ifndef _OBJECT_DEF_HA
 #define _OBJECT_DEF_HA
-
+#define _USE_MATH_DEFINES
 #include <fstream>
 #include <iostream>
 #include <glad/glad.h>
@@ -35,42 +35,20 @@ class Topo: public Renderable {
       GLuint topoVertexArrayID;
       vector<GLfloat> topoVertex;
       vector<GLfloat> topoColor;
-	   shared_ptr<Program> prog;
+      vector<GLfloat> topoNormals;
+	   shared_ptr<Program> shader;
       void readTopo(string filename);
       void insertPoint(float minz, float maxz, unsigned char *data, unsigned int x, unsigned int y, unsigned int width, unsigned int height);
       void fillTopoArrays(unsigned char *data, unsigned int width, unsigned int height);
+      void generateNormals();
+      void createShader();
    public :
-      void init(string filename, shared_ptr<Program> p);
+      void init(string filename);
       void render(shared_ptr<MatrixStack> Projection,
                   shared_ptr<MatrixStack> View,
                   shared_ptr<MatrixStack> Model);
 };
 
-
-//class Tree { //renderable, but a slightly different render function
-//   private :
-//      glm::vec3 loc;
-//      glm::vec3 scale;
-//      static vector<shared_ptr<Shape>> mesh;
-//   public :
-//      void render(shared_ptr<MatrixStack> Model,
-//                  shared_ptr<Program> prog);
-//      void init(glm::vec3 l, glm::vec3 s);
-//};
-//class Forest : public Renderable {
-//   private :
-//      int width;
-//      int len;
-//      int seperation;
-//      shared_ptr<Program> prog;
-//      vector<shared_ptr<Tree>> trees;
-//      void fillTrees();
-//   public :
-//      void init(int w, int l, int sep, shared_ptr<Program> p);
-//      void render(shared_ptr<MatrixStack> Projection,
-//                  shared_ptr<MatrixStack> View,
-//                  shared_ptr<MatrixStack> Model);
-//};
 class Cover {
    private :
       glm::vec3 trans;
@@ -145,8 +123,9 @@ class GroundMap : public Renderable {
 class LandType {
    private :
       static vector<shared_ptr<Shape>> mesh;
-      static shared_ptr<Program> shader;
    public :
+	   static shared_ptr<Program> shader;
+
       static void getMeshByType(unsigned char type,   vector<shared_ptr<Shape>> &mesh);
       static void getShaderByType(unsigned char type, shared_ptr<Program> &shader);
       static void init();
@@ -158,5 +137,8 @@ class State {
       static vec3 viewPosition;
       static vec3 viewRotation;
       static float scaler;
+      static vec3 lightPos;
+      static vec3 lightCol;
+      static void reset();
 };
 #endif
