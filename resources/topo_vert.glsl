@@ -6,6 +6,7 @@ uniform mat4 V;
 uniform mat4 M;
 out vec3 fragNor;
 out vec3 vpos;
+
 void main()
 {
 	gl_Position = P * V * M * vertPos;

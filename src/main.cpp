@@ -35,7 +35,6 @@ public:
 
 	// Our shader program
 	std::shared_ptr<Program> prog;
-	std::shared_ptr<Program> treeShade;
 
 	// Shape to be used (from  file) - modify to support multiple
 
@@ -68,9 +67,6 @@ public:
 	void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
 	{
       float delta = .1;
-      if(key == GLFW_KEY_L && action == GLFW_PRESS){
-         cout << State::viewPosition[0] << "," << State::viewPosition[1] << "," << State::viewPosition[2] << endl;
-      }
 		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		{
 			glfwSetWindowShouldClose(window, GL_TRUE);
@@ -81,10 +77,10 @@ public:
 		if (key == GLFW_KEY_X && action == GLFW_PRESS) {
 			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 		}
-		if (key == GLFW_KEY_O && action == GLFW_RELEASE) {
+		if (key == GLFW_KEY_M && action == GLFW_RELEASE) {
          State::scaler*=2;
 		}
-		if (key == GLFW_KEY_I && action == GLFW_RELEASE) {
+		if (key == GLFW_KEY_N && action == GLFW_RELEASE) {
          State::scaler/=2;
 		}
       //WASD
@@ -152,24 +148,31 @@ public:
       }
 
       if(key == GLFW_KEY_R && action == GLFW_PRESS){
-         State::viewPosition = vec3(0,0,0);
-         State::viewRotation = vec3(0,0,0);
+         State::reset();
       }
 
-      if(key == GLFW_KEY_Y && action == GLFW_PRESS){
-         LY*=2;
-         treeShade->bind(); 
-         glUniform3f(treeShade->getUniform("lightPos"), 0, LY, 0);
-         treeShade->unbind(); 
-         cout << LY << endl;
+      if(key == GLFW_KEY_J && action == GLFW_PRESS){ //light things
+         State::lightPos[0]-=20;
       }
-      if(key == GLFW_KEY_T && action == GLFW_PRESS){
-         LY/=2;
-         treeShade->bind(); 
-         glUniform3f(treeShade->getUniform("lightPos"), 0, LY, 0);
-         treeShade->unbind(); 
-         cout << LY << endl;
+      if(key == GLFW_KEY_L && action == GLFW_PRESS){
+         State::lightPos[0]+=20;
       }
+      if(key == GLFW_KEY_I && action == GLFW_PRESS){
+         State::lightPos[2]+=20;
+      }
+      if(key == GLFW_KEY_K && action == GLFW_PRESS){
+         State::lightPos[2]-=20;
+      }
+      if(key == GLFW_KEY_U && action == GLFW_PRESS){
+         State::lightPos[1]-=20;
+      }
+      if(key == GLFW_KEY_O && action == GLFW_PRESS){
+         State::lightPos[1]+=20;
+      }
+      cout << State::lightPos[0];
+      cout << State::lightPos[1];
+      cout << State::lightPos[2];
+      cout << endl;
 	}
    /*
     * clicking just moves forward by one unit right now
@@ -196,51 +199,13 @@ public:
 		glClearColor(.12f, .34f, .56f, 1.0f);
 		// Enable z-buffer test.
 		glEnable(GL_DEPTH_TEST);
-
-		// Initialize the GLSL program.
-		prog = make_shared<Program>();
-		prog->setVerbose(true);
-		prog->setShaderNames(resourceDirectory + "/simple_vert.glsl", resourceDirectory + "/simple_frag.glsl");
-		prog->init();
-		prog->addUniform("P");
-		prog->addUniform("V");
-		prog->addUniform("M");
-		prog->addAttribute("vertPos");
-		prog->addAttribute("vertCol");
-
-      treeShade = make_shared<Program>();
-		treeShade->setVerbose(true);
-		treeShade->setShaderNames(resourceDirectory + "/tree_vert.glsl", resourceDirectory + "/tree_frag.glsl");
-		treeShade->init();
-		treeShade->addUniform("P");
-		treeShade->addUniform("V");
-		treeShade->addUniform("M");
-      treeShade->addUniform("MatDif");
-      treeShade->addUniform("lightColor");
-      treeShade->addUniform("MatAmb");
-      treeShade->addUniform("MatSpec");
-      treeShade->addUniform("shine");
-      treeShade->addUniform("lightPos");
-		treeShade->addAttribute("vertPos");
-		treeShade->addAttribute("vertNor");
-
-      treeShade->bind(); //TODO mess with this material def
-      glUniform3f(treeShade->getUniform("lightColor"), 1, 1,1);
-      glUniform3f(treeShade->getUniform("lightPos"), 0, LY, 0);
-      glUniform3f(treeShade->getUniform("MatAmb"), 0.02, .03, 0.02);
-      glUniform3f(treeShade->getUniform("MatDif"), 0.03, 0.5, 0.01);
-      //glUniform3f(treeShade->getUniform("MatSpec"), 0.025, 0.025, 0.025);
-      glUniform3f(treeShade->getUniform("MatSpec"), 0.01, 0.02, 0.01);
-      glUniform1f(treeShade->getUniform("shine"), .01);
-      treeShade->unbind();
-
-
+      
       LandType::init(); //TODO pass in resource dir
 	}
    GLfloat LY = 10;
 	void initSceneObjects(const std::string& resourceDirectory){
       shared_ptr<Topo> ground = make_shared<Topo>();
-      ground->init(resourceDirectory + "/topo.jpg", prog); //TODO make this a cli arg
+      ground->init(resourceDirectory + "/topo.jpg"); //TODO make this a cli arg
       renderables.push_back((shared_ptr<Renderable>)ground);
       
       shared_ptr<GroundMap> groundMap = make_shared<GroundMap>();
@@ -352,6 +317,7 @@ int main(int argc, char *argv[])
       double delta = now - lastTime;
       lastTime = now;
       application->moveView(delta);
+	   //cout << delta / 1000 << endl;
 	}
 
 	// Quit program.
