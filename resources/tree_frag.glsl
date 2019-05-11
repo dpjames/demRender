@@ -9,20 +9,21 @@ uniform vec3 lightPos;
 in vec3 fragNor;
 in vec3 vpos;
 in vec2 vTexCoord;
-out vec3 color;
+out vec4 color;
 
 
 void main()
 {
-   //vec4 texColor0 = texture(Texture0, vTexCoord);
+   vec4 texColor0 = texture(Texture0, normalize(vTexCoord));
 	vec3 normal = normalize(fragNor);
    float cmag = length(lightCol);
    vec3 lightVec = normalize(lightPos - vpos);
    float costheta = max(0, dot(normal, lightVec));
    vec3 viewVec = normalize(-1 * vpos);
    vec3 H = normalize((lightVec + viewVec) / length(lightVec + viewVec));
-   float red =   (MatSpec[0] * (pow(max(0,dot(normal,H)),shine)) * lightCol[0]) + MatAmb[0] + (costheta * cmag * MatDif[0] * lightCol[0]) ;//+ texColor0[0];
-   float green = (MatSpec[1] * (pow(max(0,dot(normal,H)),shine)) * lightCol[1]) + MatAmb[1] + (costheta * cmag * MatDif[1] * lightCol[1]) ;//+ texColor0[1];
-   float blue =  (MatSpec[2] * (pow(max(0,dot(normal,H)),shine)) * lightCol[2]) + MatAmb[2] + (costheta * cmag * MatDif[2] * lightCol[2]) ;//+ texColor0[2];
-   color =(vec3(red,green,blue));
+   float red =   (MatSpec[0] * (pow(max(0,dot(normal,H)),shine)) * lightCol[0]) + MatAmb[0] + (costheta * cmag * MatDif[0] * lightCol[0]) + texColor0[0];
+   float green = (MatSpec[1] * (pow(max(0,dot(normal,H)),shine)) * lightCol[1]) + MatAmb[1] + (costheta * cmag * MatDif[1] * lightCol[1]) + texColor0[1];
+   float blue =  (MatSpec[2] * (pow(max(0,dot(normal,H)),shine)) * lightCol[2]) + MatAmb[2] + (costheta * cmag * MatDif[2] * lightCol[2]) + texColor0[2];
+   //color =(vec3(red,green,blue));
+	color = texColor0;
 }

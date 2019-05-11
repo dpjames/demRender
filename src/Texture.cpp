@@ -29,7 +29,6 @@ void Texture::init()
 	if(!data) {
 		cerr << filename << " not found" << endl;
 	}
-   cout << w << "x" << h << endl;
 	if(ncomps != 3) {
 		cerr << filename << " must have 3 components (RGB)" << endl;
 	}
@@ -38,6 +37,7 @@ void Texture::init()
 	}
 	width = w;
 	height = h;
+   cout << w << "x" << h << endl;
 
 	// Generate a texture buffer object
 	glGenTextures(1, &tid);

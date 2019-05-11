@@ -196,7 +196,7 @@ void Topo::generateNormals(){
  */
 void Topo::fillTopoArrays(unsigned char *data, unsigned int width, unsigned int height){
    //topoVertex 
-   float scale = 3; //TODO make this passed in by init
+   float scale = 10; //TODO make this passed in by init
    float minZ = data[0];
    float maxZ = data[0];
    //find a scale for the height data. This is usually 0-255, but could change to lager ranges in the future
@@ -251,9 +251,9 @@ void Topo::init(string filename){
    createShader();
 }
 void Topo::createTexture(){
-   Texture t;
-   t.setFilename("../resources/topo.tex.jpg"); //TODO pass in
-   t.init();
+   //Texture t;
+   //t.setFilename("../resources/topo.tex.jpg"); //TODO pass in
+   //t.init();
    //unsigned char* dataunscale, data;
    //int width;
    //int height;
@@ -332,12 +332,13 @@ void LandType::init(){
    shader->addAttribute("vertPos");
    shader->addAttribute("vertNor");
    shader->addAttribute("vertTex");
-   setMaterial(shader, TREE_MATERIAL);
    shader->bind();
    Texture t;
    t.setFilename("../resources/plants/tree.tex.jpg");
    t.init();
+   t.setWrapModes(GL_REPEAT,GL_REPEAT);
    shader->unbind();
+   setMaterial(shader, 1);
 }
 
 /**********************/
