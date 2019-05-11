@@ -9,6 +9,7 @@
 #include "Program.h"
 #include "Shape.h"
 #include "MatrixStack.h"
+#include "Texture.h"
 #include "WindowManager.h"
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader/tiny_obj_loader.h>
@@ -42,6 +43,7 @@ class Topo: public Renderable {
       void fillTopoArrays(unsigned char *data, unsigned int width, unsigned int height);
       void generateNormals();
       void createShader();
+      void createTexture();
    public :
       void init(string filename);
       void render(shared_ptr<MatrixStack> Projection,
@@ -139,6 +141,7 @@ class State {
       static float scaler;
       static vec3 lightPos;
       static vec3 lightCol;
+      static GLfloat zscale;
       static void reset();
 };
 #endif
