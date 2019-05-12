@@ -37,6 +37,7 @@ class Topo: public Renderable {
       vector<GLfloat> topoVertex;
       vector<GLfloat> topoColor;
       vector<GLfloat> topoNormals;
+      vector<GLfloat> topoTex;
 	   shared_ptr<Program> shader;
       void readTopo(string filename);
       void insertPoint(float minz, float maxz, unsigned char *data, unsigned int x, unsigned int y, unsigned int width, unsigned int height);
@@ -143,5 +144,6 @@ class State {
       static vec3 lightCol;
       static GLfloat zscale;
       static void reset();
+      static int topoDetailLevel;
 };
 #endif
