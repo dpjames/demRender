@@ -24,7 +24,7 @@ void Texture::init()
 {
 	// Load texture
 	int w, h, ncomps;
-	stbi_set_flip_vertically_on_load(true);
+	stbi_set_flip_vertically_on_load(false);
 	unsigned char *data = stbi_load(filename.c_str(), &w, &h, &ncomps, 0);
 	if(!data) {
 		cerr << filename << " not found" << endl;
