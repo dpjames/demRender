@@ -1,0 +1,2 @@
+gdal_translate -of JPEG -scale output.tiff ../topo.jpg
+
