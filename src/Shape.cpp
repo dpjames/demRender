@@ -52,7 +52,7 @@ void Shape::measure()
 void Shape::generateNormals(){
    cout << "generating normals" << endl;
    vector<GLfloat> normals(posBuf.size(),0); 
-   for(int i = 0; i < posBuf.size(); i+=9){
+   for(unsigned int i = 0; i < posBuf.size(); i+=9){
       vec3 p1 = vec3(posBuf[i+0], posBuf[i+1], posBuf[i+2]);
       vec3 p2 = vec3(posBuf[i+3], posBuf[i+4], posBuf[i+5]);
       vec3 p3 = vec3(posBuf[i+6], posBuf[i+7], posBuf[i+8]);
@@ -70,15 +70,17 @@ void Shape::generateNormals(){
       normals[i + 8]+=normal[2];
    }
    int per5 = normals.size() * .05;
-   for(int i = 0; i < normals.size(); i+=3){
+   for(unsigned int i = 0; i < normals.size(); i+=3){
       if(i % per5 == 0){
-         cout << (float)i / normals.size() * 100 << "%" << endl;
+         cout << "\r";
+         cout << (float)i / normals.size() * 100 << "%";
       }
       vec3 normalized = glm::normalize(vec3(normals[i+0], normals[i+1], normals[i+2]));
       normals[i + 0] = normalized[0];
       normals[i + 1] = normalized[1];
       normals[i + 2] = normalized[2];
    }
+   cout << "\r" << "      " << "\r";
    norBuf = normals;
 
 }

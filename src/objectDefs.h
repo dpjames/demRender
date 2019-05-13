@@ -1,6 +1,9 @@
 #ifndef _OBJECT_DEF_HA
 #define _OBJECT_DEF_HA
 #define _USE_MATH_DEFINES
+#define TREE_MATERIAL 3
+#define TOPO_MATERIAL 4
+#define N_MATERIAL 5
 #include <fstream>
 #include <iostream>
 #include <glad/glad.h>
@@ -25,6 +28,7 @@ using glm::vec3;
 class Renderable {
    public :
       virtual void render(shared_ptr<MatrixStack> Projection,shared_ptr<MatrixStack> View,shared_ptr<MatrixStack> Model) = 0;
+      virtual void updateMaterial() = 0;
 };
 class Updateable {
    public :
@@ -45,11 +49,13 @@ class Topo: public Renderable {
       void generateNormals();
       void createShader();
       void createTexture();
+      int cMat = TOPO_MATERIAL;
    public :
       void init(string filename);
       void render(shared_ptr<MatrixStack> Projection,
                   shared_ptr<MatrixStack> View,
                   shared_ptr<MatrixStack> Model);
+      void updateMaterial();
 };
 
 class Cover {
@@ -64,7 +70,7 @@ class Cover {
                    vector<shared_ptr<Shape>> mesh);
 };
 
-class LandCover : public Renderable {
+class LandCover {
    private :
       shared_ptr<Program> shader;
       vector<shared_ptr<Shape>> mesh;
@@ -120,6 +126,7 @@ class GroundMap : public Renderable {
       void render(shared_ptr<MatrixStack> Projection,
                   shared_ptr<MatrixStack> View,
                   shared_ptr<MatrixStack> Model);
+      void updateMaterial();
 };
 
 
@@ -137,6 +144,12 @@ class LandType {
 
 class State {
    public :
+      static vec3 initViewPosition;
+      static vec3 initViewRotation;
+      static vec3 initLightPos;
+      static vec3 initLightCol;
+      static float initScaler;
+
       static vec3 viewPosition;
       static vec3 viewRotation;
       static float scaler;
@@ -145,5 +158,7 @@ class State {
       static GLfloat zscale;
       static void reset();
       static int topoDetailLevel;
+      static string resourceDirectory;
+      static void generateOptionalMesh(string fname);
 };
 #endif
