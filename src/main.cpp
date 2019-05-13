@@ -77,10 +77,10 @@ public:
 		if (key == GLFW_KEY_X && action == GLFW_PRESS) {
 			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 		}
-		if (key == GLFW_KEY_M && action == GLFW_RELEASE) {
+		if (key == GLFW_KEY_N && action == GLFW_RELEASE) {
          State::scaler*=2;
 		}
-		if (key == GLFW_KEY_N && action == GLFW_RELEASE) {
+		if (key == GLFW_KEY_B && action == GLFW_RELEASE) {
          State::scaler/=2;
 		}
       //WASD
@@ -169,10 +169,10 @@ public:
       if(key == GLFW_KEY_O && action == GLFW_PRESS){
          State::lightPos[1]+=20;
       }
-      cout << State::lightPos[0];
-      cout << State::lightPos[1];
-      cout << State::lightPos[2];
-      cout << endl;
+
+      if(key == GLFW_KEY_M && action == GLFW_PRESS){
+         renderables[0]->updateMaterial();
+      }
 	}
    /*
     * clicking just moves forward by one unit right now
@@ -191,7 +191,7 @@ public:
 	{
 		glViewport(0, 0, width, height);
 	}
-	void init(const std::string& resourceDirectory)
+	void init()
 	{
 		GLSL::checkVersion();
 
@@ -200,16 +200,16 @@ public:
 		// Enable z-buffer test.
 		glEnable(GL_DEPTH_TEST);
       
-      LandType::init(); //TODO pass in resource dir
+      LandType::init(); 
 	}
    GLfloat LY = 10;
-	void initSceneObjects(const std::string& resourceDirectory){
+	void initSceneObjects(){
       shared_ptr<Topo> ground = make_shared<Topo>();
-      ground->init(resourceDirectory + "/topo.jpg"); //TODO make this a cli arg
+      ground->init(State::resourceDirectory + "/topo.jpg"); 
       renderables.push_back((shared_ptr<Renderable>)ground);
       
       shared_ptr<GroundMap> groundMap = make_shared<GroundMap>();
-      groundMap->init(resourceDirectory + "/landcover.jpg", resourceDirectory + "/topo.jpg");
+      groundMap->init(State::resourceDirectory + "/landcover.jpg", State::resourceDirectory + "/topo.jpg");
       renderables.push_back((shared_ptr<Renderable>)groundMap);
       
    }
@@ -220,9 +220,7 @@ public:
    //updates the above variables according to how much time has passed since the last update.
    void moveView(double dt){
       dt*=1000;
-      vec3 curViewPos = State::viewPosition;
       vec3 viewPosMod = vec3(0,0,0);
-      vec3 curViewRot = State::viewRotation;
       vec3 viewRotMod = vec3(0,0,0);
       if(moveDir[0] != 0){
          viewPosMod[0] = -1*dt*moveDir[0];
@@ -265,23 +263,45 @@ public:
       View->translate(State::viewPosition);
       Model->pushMatrix();
          Model->loadIdentity();
-         Model->scale(vec3(State::scaler, State::scaler, State::scaler)); //TODO remove neg
+         Model->scale(vec3(State::scaler, State::scaler, State::scaler));
          for(unsigned int i = 0; i < renderables.size(); i++){
             renderables[i]->render(Projection,View,Model);
          }
       Model->popMatrix();
 	}
 };
-
+void setOpt(char opt, char *value){
+   switch(opt){
+      case 'z':
+         State::zscale = stof(value);
+         break;
+      case 'd':
+         State::topoDetailLevel = stoi(value);
+         break;
+      case 'r':
+         State::resourceDirectory = value;
+         break;
+      default:
+         cout << "option: '" << opt << "' not found, ignoring" << endl;
+         break;
+   }
+}
+void parseArgs(int argc, char ** argv){
+   for(int i = 1; i <  argc - 1; i+=2){
+      if(argv[i][0] != '-'){
+         cout << "bad usage for switch: " << argv[i] << endl;
+         cout << "ignoring" << endl;
+         continue;
+      }
+      char opt = argv[i][1];
+      cout << opt << ":" << argv[i + 1] << endl;
+      setOpt(opt, argv[i+1]);
+   }
+}
 int main(int argc, char *argv[])
 {
 	// Where the resources are loaded from
-	std::string resourceDir = "../resources";
-   	if (argc >= 2)
-	{
-		resourceDir = argv[1];
-	}
-
+   parseArgs(argc, argv);
 	Application *application = new Application();
 
 	// Your main will always include a similar set up to establish your window
@@ -295,10 +315,10 @@ int main(int argc, char *argv[])
 	// This is the code that will likely change program to program as you
 	// may need to initialize or set up different data and state
    
-	application->init(resourceDir);
-	//application->initGeom(resourceDir);
+	application->init();
+	//application->initGeom();
 
-   application->initSceneObjects(resourceDir);
+   application->initSceneObjects();
 	// Loop until the user closes the window.
    double lastTime = glfwGetTime();
 	while (! glfwWindowShouldClose(windowManager->getHandle()))

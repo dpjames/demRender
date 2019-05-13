@@ -37,8 +37,6 @@ void Texture::init()
 	}
 	width = w;
 	height = h;
-   cout << w << "x" << h << endl;
-
 	// Generate a texture buffer object
 	glGenTextures(1, &tid);
 	// Bind the current texture to be the newly generated texture object
