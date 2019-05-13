@@ -240,8 +240,15 @@ public:
       if(moveDir[5] != 0){
          
       }
-      State::viewPosition+=viewPosMod;
       State::viewRotation+=viewRotMod;
+      auto RotMat = make_shared<MatrixStack>();
+      RotMat->loadIdentity();
+      RotMat->rotate(-1 * State::viewRotation[0], vec3(1,0,0));
+      RotMat->rotate(-1 * State::viewRotation[1], vec3(0,1,0));
+      RotMat->rotate(-1 * State::viewRotation[2], vec3(0,0,1));
+      RotMat->translate(viewPosMod);
+      viewPosMod = RotMat->topMatrix()[3];
+      State::viewPosition+=viewPosMod;
    }
 	void render()
 	{
@@ -260,9 +267,9 @@ public:
       View->loadIdentity();
       View->rotate(State::viewRotation[0], vec3(1,0,0));
       View->rotate(State::viewRotation[1], vec3(0,1,0));
-      View->translate(State::viewPosition);
       Model->pushMatrix();
          Model->loadIdentity();
+         Model->translate(State::viewPosition);
          Model->scale(vec3(State::scaler, State::scaler, State::scaler));
          for(unsigned int i = 0; i < renderables.size(); i++){
             renderables[i]->render(Projection,View,Model);
