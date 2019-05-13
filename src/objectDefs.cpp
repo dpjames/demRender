@@ -33,15 +33,15 @@ void setMaterial(shared_ptr<Program> p, int material){
          glUniform1f(p->getUniform("shine"), 27.9);
          break;
       case TREE_MATERIAL: //tree
-         glUniform3f(p->getUniform("MatAmb"), 0.2, .3, 0.2);
+         glUniform3f(p->getUniform("MatAmb"), 0.05, .05, 0.05);
          glUniform3f(p->getUniform("MatDif"), 0.03, 0.5, 0.01);
          glUniform3f(p->getUniform("MatSpec"), 0.01, 0.02, 0.01);
          glUniform1f(p->getUniform("shine"), .01);
          break;
       case TOPO_MATERIAL: // topo
-         glUniform3f(p->getUniform("MatAmb"), 0.1, 0.1, 0.1);
-         glUniform3f(p->getUniform("MatDif"), 0.3, 0.3, 0.4);
-         glUniform3f(p->getUniform("MatSpec"), 1, 1, 1);
+         glUniform3f(p->getUniform("MatAmb"), 0.4, 0.4, 0.4);
+         glUniform3f(p->getUniform("MatDif"), 0.2, 0.2, 0.2);
+         glUniform3f(p->getUniform("MatSpec"), 0, 0, 0);
          glUniform1f(p->getUniform("shine"), 1.0);
          break;
    }
