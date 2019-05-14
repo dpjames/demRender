@@ -247,7 +247,7 @@ public:
       RotMat->rotate(-1 * State::viewRotation[1], vec3(0,1,0));
       RotMat->rotate(-1 * State::viewRotation[2], vec3(0,0,1));
       RotMat->translate(viewPosMod);
-      viewPosMod = RotMat->topMatrix()[3];
+      viewPosMod = vec3(RotMat->topMatrix()[3]);
       State::viewPosition+=viewPosMod;
    }
 	void render()
