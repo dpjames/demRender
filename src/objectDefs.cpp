@@ -482,9 +482,9 @@ void Cover::render(shared_ptr<MatrixStack> Model,
 /**********************/
 
 //initial state
-vec3  State::initViewPosition = vec3(0,-13,-535);
-vec3  State::initViewRotation = vec3(0,M_PI/2,0);
-vec3  State::initLightPos     = vec3(0,50,535);
+vec3  State::initViewPosition = vec3(0,0,0);
+vec3  State::initViewRotation = vec3(0,0,0);
+vec3  State::initLightPos     = vec3(0,200,0);
 vec3  State::initLightCol     = vec3(1,1,1);
 float State::initScaler       = 1;
 
