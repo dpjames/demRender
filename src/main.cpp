@@ -205,11 +205,11 @@ public:
    GLfloat LY = 10;
 	void initSceneObjects(){
       shared_ptr<Topo> ground = make_shared<Topo>();
-      ground->init(State::resourceDirectory + "/topo.jpg"); 
+      ground->init(State::resourceDirectory + State::placeDirectory + "/topo.jpg"); 
       renderables.push_back((shared_ptr<Renderable>)ground);
       
       shared_ptr<GroundMap> groundMap = make_shared<GroundMap>();
-      groundMap->init(State::resourceDirectory + "/landcover.jpg", State::resourceDirectory + "/topo.jpg");
+      groundMap->init(State::resourceDirectory + State::placeDirectory + "/landcover.jpg", State::resourceDirectory + State::placeDirectory + "/topo.jpg");
       renderables.push_back((shared_ptr<Renderable>)groundMap);
       
    }
@@ -288,6 +288,8 @@ void setOpt(char opt, char *value){
       case 'r':
          State::resourceDirectory = value;
          break;
+      case 'p':
+         State::placeDirectory = "/" + string(value);
       default:
          cout << "option: '" << opt << "' not found, ignoring" << endl;
          break;

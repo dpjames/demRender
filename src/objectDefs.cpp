@@ -273,7 +273,7 @@ void Topo::init(string filename){
 void Topo::createTexture(){
    shader->bind();
    Texture t;
-   t.setFilename(State::resourceDirectory + "/topo.tex.jpg");
+   t.setFilename(State::resourceDirectory + State::placeDirectory + "/topo.tex.jpg");
    t.init();
    t.setWrapModes(GL_REPEAT,GL_REPEAT);
    shader->unbind();
@@ -499,6 +499,7 @@ float State::scaler = 1;
 GLfloat State::zscale = 1;
 int State::topoDetailLevel = 10;
 string State::resourceDirectory = "../resources";
+string State::placeDirectory = "/.";
 
 void State::reset(){
    State::viewPosition = State::initViewPosition;

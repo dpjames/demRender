@@ -160,5 +160,6 @@ class State {
       static int topoDetailLevel;
       static string resourceDirectory;
       static void generateOptionalMesh(string fname);
+      static string placeDirectory;
 };
 #endif
