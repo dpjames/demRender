@@ -23,6 +23,7 @@
 using std::vector;
 using std::shared_ptr;
 using std::string;
+using std::ifstream;
 using glm::vec3;
 
 class Renderable {
@@ -44,8 +45,8 @@ class Topo: public Renderable {
       vector<GLfloat> topoTex;
 	   shared_ptr<Program> shader;
       void readTopo(string filename);
-      void insertPoint(float minz, float maxz, unsigned char *data, unsigned int x, unsigned int y, unsigned int width, unsigned int height);
-      void fillTopoArrays(unsigned char *data, unsigned int width, unsigned int height);
+      void insertPoint(int minZ, uint32_t *data, unsigned int x, unsigned int y, unsigned int width, unsigned int height);
+      void fillTopoArrays(uint32_t *data, unsigned int width, unsigned int height);
       void generateNormals();
       void createShader();
       void createTexture();

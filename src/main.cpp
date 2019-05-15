@@ -290,6 +290,7 @@ void setOpt(char opt, char *value){
          break;
       case 'p':
          State::placeDirectory = "/" + string(value);
+         break;
       default:
          cout << "option: '" << opt << "' not found, ignoring" << endl;
          break;

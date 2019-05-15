@@ -56,6 +56,34 @@ void readJPG(string filename, unsigned char*& data, int *width, int *height, int
       perror(filename.c_str()); 
       return;
    }
+   cout << "pcount for jpg!!";
+   cout << *width * *height << endl;
+}
+void readBin(string filename, uint32_t *&data, int *width, int *height){
+   cout << "reading bin";
+   vector<uint32_t> vdata;
+   ifstream file;
+   file.open(filename, std::ios::binary);
+   //uint32_t oneData = 0;
+   char oneData[4];
+   file.read(oneData, sizeof(char) * 4);
+   *width = *((uint32_t *)oneData);
+   file.read(oneData, sizeof(char) * 4);
+   *height = *((uint32_t *)oneData);
+   std::vector<unsigned char> buffer(std::istreambuf_iterator<char>(file), {});
+   cout << buffer.size() << endl;
+   int npix = *width * *height;
+   data = (uint32_t *) malloc(sizeof(uint32_t) * npix);
+   for(int i = 0; i < buffer.size()/4; i++){
+      data[i] = ((uint32_t *)buffer.data())[i];
+   }
+   //cout << npix << "||||" << endl;
+   //data = cdata;
+   //cout << "\rdone reading bin" << endl;
+   //cout << npix << endl;
+   //for(int i = 0; i < 10; i++){
+   //      cout << data[i * 100000] << endl;
+   //}
 }
 void readObj(string fname, vector<shared_ptr<Shape>> &mesh){
    vector<tinyobj::shape_t> tss;
@@ -154,16 +182,20 @@ void Topo::readTopo(string filename){
    int width = 0;
    int height = 0;
    int n = 0;
-   unsigned char *data;
-   readJPG(filename, data, &width, &height, &n);
+   uint32_t *data;
+   //readJPG(filename, data, &width, &height, &n);
+   readBin("../resources/RAINIER/topo.bin", data, &width, &height);
+   cout << data[20000] << "!!"<< endl;
+   cout << data[30000] << "!!"<< endl;
+   cout << data[100000] << "!!"<< endl;
    fillTopoArrays(data, width, height); 
 }
 /*
  * insert a point into the topo data arrays. this needs to be modified to change the initial orientation.
  * (the x, y and z axis are flipped around currently)
  */
-void Topo::insertPoint(float minz, float maxz, unsigned char *data, unsigned int x, unsigned int y, unsigned int width, unsigned int height){
-   float z = data[x + y * width] * State::zscale;
+void Topo::insertPoint(int minZ, uint32_t *data, unsigned int x, unsigned int y, unsigned int width, unsigned int height){
+   float z = (data[x + y * width] - minZ)* State::zscale;
    topoVertex.push_back(x);
    topoVertex.push_back(z);
    topoVertex.push_back(y);
@@ -207,7 +239,7 @@ void Topo::generateNormals(){
 /*
  * use the image data pointer and the width/height to fill topoColor and topoVertex
  */
-void Topo::fillTopoArrays(unsigned char *data, unsigned int width, unsigned int height){
+void Topo::fillTopoArrays(uint32_t *data, unsigned int width, unsigned int height){
    //topoVertex 
    float scale = State::topoDetailLevel; 
    float minZ = data[0];
@@ -225,14 +257,14 @@ void Topo::fillTopoArrays(unsigned char *data, unsigned int width, unsigned int 
    for(unsigned int y = 0; y < height - scale; y+=scale){
       for(unsigned int x = 0; x < width; x+=scale){
          if(x + scale < width){
-            insertPoint(minZ,maxZ, data, x, y, width,height);
-            insertPoint(minZ,maxZ, data, x, y + scale, width,height);
-            insertPoint(minZ,maxZ, data, x + scale, y, width,height);
+            insertPoint(minZ, data, x, y, width,height);
+            insertPoint(minZ, data, x, y + scale, width,height);
+            insertPoint(minZ, data, x + scale, y, width,height);
          }
          if(x >= scale){
-            insertPoint(minZ,maxZ, data, x, y, width,height);
-            insertPoint(minZ,maxZ, data, x - scale, y + scale, width,height);
-            insertPoint(minZ,maxZ, data, x, y + scale, width,height);
+            insertPoint(minZ, data, x, y, width,height);
+            insertPoint(minZ, data, x - scale, y + scale, width,height);
+            insertPoint(minZ, data, x, y + scale, width,height);
          }
       }
    }
