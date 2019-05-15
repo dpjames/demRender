@@ -3,6 +3,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommand>$(TargetPath)</LocalDebuggerCommand>
-    <LocalDebuggerCommandArguments>-d 1 -z .1 -p RAINIER</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-d 1 -z 1 -p ZION</LocalDebuggerCommandArguments>
   </PropertyGroup>
 </Project>

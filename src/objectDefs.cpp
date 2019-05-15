@@ -184,10 +184,7 @@ void Topo::readTopo(string filename){
    int n = 0;
    uint32_t *data;
    //readJPG(filename, data, &width, &height, &n);
-   readBin("../resources/RAINIER/topo.bin", data, &width, &height);
-   cout << data[20000] << "!!"<< endl;
-   cout << data[30000] << "!!"<< endl;
-   cout << data[100000] << "!!"<< endl;
+   readBin(filename, data, &width, &height);
    fillTopoArrays(data, width, height); 
 }
 /*
