@@ -106,22 +106,21 @@ void readObj(string fname, vector<shared_ptr<Shape>> &mesh){
 /**********************/
 /* BEGIN GROUND CLASS */
 /**********************/
-void GroundMap::init(string lcfile, string demfile){
-   int demwidth, demheight, demn, lcwidth, lcheight, lcn;
+void GroundMap::init(string lcfile, uint32_t *demdata, int demwidth, int demheight){
+   int lcwidth, lcheight, lcn;
    unsigned char *lcdata;
-   unsigned char *demdata;
    readJPG(lcfile, lcdata, &lcwidth, &lcheight, &lcn);
-   readJPG(demfile, demdata, &demwidth, &demheight, &demn);
    generateMap(lcdata, demdata, lcwidth, lcheight, demwidth, demheight); 
 }
 void GroundMap::generateMap(unsigned char *lcdata, 
-      unsigned char *demdata, 
+      uint32_t *demdata, 
       int lcwidth, 
       int lcheight, 
       int demwidth, 
       int demheight){
    int DY = 10;
    int DX = 10;
+   float density = 2;
    //unsigned char seen[width * height] = {};
    for(int y = 0; y < lcheight; y+=DY){
       for(int x = 0; x < lcwidth; x+=DX){
@@ -132,23 +131,7 @@ void GroundMap::generateMap(unsigned char *lcdata,
          unsigned char type = lcdata[lcindex];
          unsigned char elev = demdata[demindex];
          shared_ptr<LandCover> block = make_shared<LandCover>();
-         block->init(
-               vec3(0,0,0),
-               vec3(1,1,1),
-               vec3(0,0,0),
-               vec3(wx-DX,elev,wy-DY),
-               vec3(wx+DX,elev,wy+DX),
-               vec3(.2,.2,.2),
-               vec3(.2,.3,.2),
-               vec3(0,0,0),
-               vec3(0,0,0),
-               2,
-               type,
-               demdata,
-               demwidth,
-               demheight,
-               wx,wy
-               );
+         block->init(type, elev, density, demdata, demwidth, demheight, wx, wy, DX, DY);
          blocks.push_back(block);
       }
    }
@@ -179,20 +162,17 @@ void Topo::updateMaterial(){
    setMaterial(shader, ++cMat % N_MATERIAL);
 }
 void Topo::readTopo(string filename){
-   int width = 0;
-   int height = 0;
-   int n = 0;
    uint32_t *data;
-   //readJPG(filename, data, &width, &height, &n);
    readBin(filename, data, &width, &height);
    fillTopoArrays(data, width, height); 
+   elevationData = data;
 }
 /*
  * insert a point into the topo data arrays. this needs to be modified to change the initial orientation.
  * (the x, y and z axis are flipped around currently)
  */
 void Topo::insertPoint(int minZ, uint32_t *data, unsigned int x, unsigned int y, unsigned int width, unsigned int height){
-   float z = (data[x + y * width] - minZ)* State::zscale;
+   float z = (data[x + y * width] - minZ) * State::zscale;
    topoVertex.push_back(x);
    topoVertex.push_back(z);
    topoVertex.push_back(y);
@@ -251,6 +231,7 @@ void Topo::fillTopoArrays(uint32_t *data, unsigned int width, unsigned int heigh
          maxZ = data[i];
       }
    }
+   State::ztrans = -1 * minZ;
    for(unsigned int y = 0; y < height - scale; y+=scale){
       for(unsigned int x = 0; x < width; x+=scale){
          if(x + scale < width){
@@ -300,12 +281,9 @@ void Topo::init(string filename){
    readTopo(filename);
 }
 void Topo::createTexture(){
-   shader->bind();
-   Texture t;
-   t.setFilename(State::resourceDirectory + State::placeDirectory + "/topo.tex.jpg");
-   t.init();
-   t.setWrapModes(GL_REPEAT,GL_REPEAT);
-   shader->unbind();
+   texture.setFilename(State::resourceDirectory + State::placeDirectory + "/topo.tex.jpg");
+   texture.init();
+   texture.setWrapModes(GL_REPEAT,GL_REPEAT);
 }
 void Topo::createShader(){
    shader = make_shared<Program>();
@@ -336,8 +314,10 @@ void Topo::render(shared_ptr<MatrixStack> Projection,
    glUniformMatrix4fv(shader->getUniform("V"), 1, GL_FALSE, value_ptr(View->topMatrix()));
    glUniformMatrix4fv(shader->getUniform("M"), 1, GL_FALSE, value_ptr(Model->topMatrix()));
    glBindVertexArray(topoVertexArrayID);
+   texture.bind(0);
    glDrawArrays(GL_TRIANGLES, 0, topoVertex.size() * 3);
    glBindVertexArray(0);
+   texture.unbind();
    shader->unbind(); 
 
    Model->popMatrix();
@@ -350,19 +330,38 @@ void Topo::render(shared_ptr<MatrixStack> Projection,
 /* BEGIN LATYPE CLASS */
 /**********************/
 shared_ptr<Program> LandType::shader = make_shared<Program>(); //TODO generalize to all shaders
-vector<shared_ptr<Shape>> LandType::mesh;
-void LandType::getMeshByType(unsigned char type, vector<shared_ptr<Shape>> &meshdestination){
-   if(type == 41 || type == 42 || type == 43){
-      meshdestination = LandType::mesh; 
+vector<shared_ptr<Shape>> LandType::tree;
+vector<shared_ptr<Shape>> LandType::sphere;
+vector<shared_ptr<Shape>> LandType::barren;
+Texture LandType::treeTex;
+Texture LandType::barrenTex;
+void LandType::getDrawDataForType(unsigned char type, Texture &texdest, vector<shared_ptr<Shape>> &meshdest){
+    if(type == EVERGREEN_FOREST){
+      meshdest = LandType::tree; 
+      texdest  = LandType::treeTex;
+   } else if(type == BARREN_LAND) {
+      meshdest = LandType::barren;  
+      texdest  = LandType::barrenTex;
    } else {
-
+      meshdest = LandType::barren;  
+      texdest  = LandType::barrenTex;
+   }  
+}
+void LandType::fillTransforms(unsigned char type, vec3 &maxrotat, vec3 &minrotat, vec3 &maxscale, vec3 &minscale){
+   maxrotat = vec3(0,0,0);
+   minrotat = vec3(0,0,0);
+   minscale = vec3(.2,.2,.2);
+   maxscale = vec3(.2,.3,.2);
+   if(type != EVERGREEN_FOREST){
+      minscale = vec3(1,1,1);
+      maxscale = vec3(1,1,1);
    }
 }
-void LandType::getShaderByType(unsigned char type, shared_ptr<Program> &shaderdestination){
-   shaderdestination = LandType::shader; 
-}
+
 void LandType::init(){
-   readObj(State::resourceDirectory + "/plants/tree.obj", mesh); //TODO generalize to all mesh
+   readObj(State::resourceDirectory + "/plants/tree.obj", tree); //TODO generalize to all mesh
+   readObj(State::resourceDirectory + "/sphere.obj", sphere); //TODO generalize to all mesh
+   readObj(State::resourceDirectory + "/barren.obj", barren); //TODO generalize to all mesh
    shader = make_shared<Program>();
    shader->setVerbose(true);
    shader->setShaderNames(State::resourceDirectory + "/tree_vert.glsl", State::resourceDirectory + "/tree_frag.glsl");
@@ -379,13 +378,15 @@ void LandType::init(){
    shader->addAttribute("vertPos");
    shader->addAttribute("vertNor");
    shader->addAttribute("vertTex");
-   shader->bind();
-   Texture t;
-   t.setFilename(State::resourceDirectory + "/plants/tree.tex.jpg");
-   t.init();
-   t.setWrapModes(GL_REPEAT,GL_REPEAT);
-   shader->unbind();
-   setMaterial(shader, TREE_MATERIAL);
+
+   treeTex.setFilename(State::resourceDirectory + "/plants/tree.tex.jpg");
+   treeTex.init();
+   treeTex.setWrapModes(GL_REPEAT, GL_REPEAT);
+   barrenTex.setFilename(State::resourceDirectory + "/barren.jpg");
+   barrenTex.init();
+   barrenTex.setWrapModes(GL_REPEAT, GL_REPEAT);
+
+   setMaterial(shader, 1);
 }
 
 /**********************/
@@ -396,35 +397,24 @@ void LandType::init(){
 /* BEGIN LANDCO CLASS */
 /**********************/
 
-
-void LandCover::init(vec3 tTrans,          vec3 tScale, 
-      vec3 tRot,            vec3 mintrans, vec3 maxtrans,
-      vec3 minscale,        vec3 maxscale, 
-      vec3 minrot,          vec3 maxrot, 
-      GLfloat n,            unsigned char landType,
-      unsigned char *elev,  unsigned int ewidth,
-      unsigned int eheight, unsigned int originx, 
-      unsigned int originy){
-   LandType::getMeshByType(landType, mesh);
-   LandType::getShaderByType(landType, shader);
-   nchildren = n;
-   minTrans = mintrans;
-   maxTrans = maxtrans;
-   maxRotat = maxrot;
-   minRotat = minrot;
-   maxScale = maxscale;
-   minScale = minscale;
-   globalTrans = tTrans;
-   globalScale = tScale;
-   globalRotat = tRot;
-   fillItems(elev, ewidth, eheight, originx, originy);
+void LandCover::init(int landType, uint32_t elev, float indensity, uint32_t *dem, int demwidth, int demheight, int originx, int originy, int DX, int DY){
+   shader = LandType::shader;
+   LandType::getDrawDataForType(landType, texture, mesh);
+   density = indensity;  
+   minTrans = vec3(originx - DX, elev, originy - DY);
+   maxTrans = vec3(originy + DX, elev, originy + DY);
+   LandType::fillTransforms(landType, maxRotat, minRotat, maxScale, minScale);
+   globalTrans = vec3(0,0,0); // this will prob be removed  TODO
+   globalScale = vec3(1,1,1); // this will prob be removed
+   globalRotat = vec3(0,0,0); // this will prob be removed
+   fillItems(dem, demwidth, demheight, originx, originy);
 }
 vec3 LandCover::getPosition(){
    return minTrans;
 }
-void LandCover::fillItems(unsigned char *elev, unsigned int width, unsigned int height, unsigned int originx, unsigned int originy){
+void LandCover::fillItems(uint32_t *elev, unsigned int width, unsigned int height, unsigned int originx, unsigned int originy){
    GLfloat tx,ty,tz,sx,sy,sz,rx,ry,rz;
-   for(int i = 0; i < nchildren; i++){
+   for(int i = 0; i < density; i++){
       tx = minTrans[0] + (maxTrans[0] - minTrans[0]) * (rand() % 100000) / 100000; 
       tz = minTrans[2] + (maxTrans[2] - minTrans[2]) * (rand() % 100000) / 100000; 
       if(tx < 0){
@@ -439,8 +429,7 @@ void LandCover::fillItems(unsigned char *elev, unsigned int width, unsigned int 
       if(tz > height - 1){
          tz = height - 1;
       }
-      ty = elev[(int)tx + (int)tz * width] * State::zscale;
-      ty = 1 * ty;
+      ty = (elev[(int)tx + (int)tz * width] + State::ztrans) * State::zscale;
       sx = minScale[0] + (maxScale[0] - minScale[0]) * (rand() % 100000) / 100000;  //+ 1 to allow both directions of scaling with one vector
       sy = minScale[1] + (maxScale[1] - minScale[1]) * (rand() % 100000) / 100000; 
       sz = minScale[2] + (maxScale[2] - minScale[2]) * (rand() % 100000) / 100000; 
@@ -460,14 +449,11 @@ void LandCover::render(shared_ptr<MatrixStack> Projection,
    glUniformMatrix4fv(shader->getUniform("P"), 1, GL_FALSE, value_ptr(Projection->topMatrix()));
    glUniformMatrix4fv(shader->getUniform("V"), 1, GL_FALSE, value_ptr(View->topMatrix()));
    Model->pushMatrix();
-   Model->translate(globalTrans);
-   Model->scale(globalScale);
-   Model->rotate(globalRotat[0], vec3(1,0,0));
-   Model->rotate(globalRotat[1], vec3(0,1,0));
-   Model->rotate(globalRotat[2], vec3(0,0,1));
+   texture.bind(0);
    for(unsigned int i = 0; i < items.size(); i++){
       items[i]->render(Model, shader, mesh);
    }
+   texture.unbind();
    Model->popMatrix();
    shader->unbind();
 
@@ -513,7 +499,7 @@ void Cover::render(shared_ptr<MatrixStack> Model,
 //initial state
 vec3  State::initViewPosition = vec3(0,-13,-535);
 vec3  State::initViewRotation = vec3(0,M_PI/2,0);
-vec3  State::initLightPos     = vec3(0,50,535);
+vec3  State::initLightPos     = vec3(0,100,0);
 vec3  State::initLightCol     = vec3(1,1,1);
 float State::initScaler       = 1;
 
@@ -526,6 +512,7 @@ float State::scaler = 1;
 
 //defaults
 GLfloat State::zscale = 1;
+int State::ztrans = 0;
 int State::topoDetailLevel = 10;
 string State::resourceDirectory = "../resources";
 string State::placeDirectory = "/.";

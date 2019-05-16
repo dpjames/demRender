@@ -38,6 +38,7 @@ class Updateable {
 
 class Topo: public Renderable {
    private :
+      Texture texture;
       GLuint topoVertexArrayID;
       vector<GLfloat> topoVertex;
       vector<GLfloat> topoColor;
@@ -52,6 +53,9 @@ class Topo: public Renderable {
       void createTexture();
       int cMat = TOPO_MATERIAL;
    public :
+      uint32_t *elevationData;
+      int width;
+      int height;
       void init(string filename);
       void render(shared_ptr<MatrixStack> Projection,
                   shared_ptr<MatrixStack> View,
@@ -76,8 +80,8 @@ class LandCover {
       shared_ptr<Program> shader;
       vector<shared_ptr<Shape>> mesh;
       vector<shared_ptr<Cover>> items;
-      GLfloat seperation;
-      GLfloat nchildren;
+      Texture texture;
+      float density;
       glm::vec3 maxTrans;
       glm::vec3 minTrans;
       glm::vec3 maxRotat;
@@ -87,27 +91,10 @@ class LandCover {
       glm::vec3 globalTrans;
       glm::vec3 globalScale;
       glm::vec3 globalRotat;
-      void fillItems(unsigned char *elev, unsigned int width, unsigned int height,
+      void fillItems(uint32_t *elev, unsigned int width, unsigned int height,
                      unsigned int originx, unsigned int originy);
    public :
-      void init(
-                glm::vec3 tTrans,
-                glm::vec3 tScale,
-                glm::vec3 tRot,
-                glm::vec3 mintrans, 
-                glm::vec3 maxtrans, 
-                glm::vec3 minscale, 
-                glm::vec3 maxscale, 
-                glm::vec3 minrot, 
-                glm::vec3 maxrot, 
-                GLfloat n,
-                unsigned char landType,
-                unsigned char *elev,
-                unsigned int ewidth,
-                unsigned int eheight,
-                unsigned int originx,
-                unsigned int originy);
-
+      void init(int landType, uint32_t elev, float density, uint32_t *dem, int demwidth, int demheight, int originx, int originy, int DX, int DY);
       void render(shared_ptr<MatrixStack> Projection,
                   shared_ptr<MatrixStack> View,
                   shared_ptr<MatrixStack> Model);
@@ -117,28 +104,51 @@ class GroundMap : public Renderable {
    private :
       vector<shared_ptr<LandCover>> blocks;
       void generateMap(unsigned char *lcdata, 
-                       unsigned char *demdata, 
+                       uint32_t *demdata, 
                        int lcwidth, 
                        int lcheight, 
                        int demwidth, 
                        int demheight);
    public :
-      void init(string lcfile, string demfile);
+      void init(string lcfile, uint32_t *demdata, int demwidth, int demheight);
       void render(shared_ptr<MatrixStack> Projection,
                   shared_ptr<MatrixStack> View,
                   shared_ptr<MatrixStack> Model);
       void updateMaterial();
 };
 
-
+#define OPEN_WATER 11 
+#define SNOW 12
+#define DEVELOPED_OPEN_SPACE 21
+#define DEVELOPED_LOW 22
+#define DEVELOPED_MED 23
+#define DEVELOPED_HIGH 24
+#define BARREN_LAND 31
+#define DECIDUOUS_FOREST 41
+#define EVERGREEN_FOREST 42 
+#define MIXED_FOREST 43
+#define DWARF_SHRUB 51
+#define SHRUB 52
+#define GRASSLAND 71
+#define SEDGE 72
+#define LICHENS 73
+#define MOSS 74
+#define PASTURE 81
+#define CROPS 82
+#define WOODED_WETLANDS 90
+#define WELAND 95
 class LandType {
    private :
-      static vector<shared_ptr<Shape>> mesh;
+      static vector<shared_ptr<Shape>> tree;
+      static vector<shared_ptr<Shape>> sphere;
+      static vector<shared_ptr<Shape>> barren;
+      static Texture treeTex;
+      static Texture barrenTex;
    public :
+      static void fillTransforms(unsigned char type, vec3 &maxrotat, vec3 &minrotat, 
+                                 vec3 &minscale, vec3 &maxscale);
+      static void getDrawDataForType(unsigned char type, Texture &texdest, vector<shared_ptr<Shape>> &meshdest);
 	   static shared_ptr<Program> shader;
-
-      static void getMeshByType(unsigned char type,   vector<shared_ptr<Shape>> &mesh);
-      static void getShaderByType(unsigned char type, shared_ptr<Program> &shader);
       static void init();
 };
 
@@ -150,7 +160,7 @@ class State {
       static vec3 initLightPos;
       static vec3 initLightCol;
       static float initScaler;
-
+      
       static vec3 viewPosition;
       static vec3 viewRotation;
       static float scaler;
@@ -162,5 +172,6 @@ class State {
       static string resourceDirectory;
       static void generateOptionalMesh(string fname);
       static string placeDirectory;
+      static int ztrans;
 };
 #endif
