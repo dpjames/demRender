@@ -77,13 +77,6 @@ void readBin(string filename, uint32_t *&data, int *width, int *height){
    for(int i = 0; i < buffer.size()/4; i++){
       data[i] = ((uint32_t *)buffer.data())[i];
    }
-   //cout << npix << "||||" << endl;
-   //data = cdata;
-   //cout << "\rdone reading bin" << endl;
-   //cout << npix << endl;
-   //for(int i = 0; i < 10; i++){
-   //      cout << data[i * 100000] << endl;
-   //}
 }
 void readObj(string fname, vector<shared_ptr<Shape>> &mesh){
    vector<tinyobj::shape_t> tss;
@@ -118,9 +111,9 @@ void GroundMap::generateMap(unsigned char *lcdata,
       int lcheight, 
       int demwidth, 
       int demheight){
-   int DY = 10;
-   int DX = 10;
-   float density = 2;
+   int DY = 1;
+   int DX = 1;
+   float density = 1;
    //unsigned char seen[width * height] = {};
    for(int y = 0; y < lcheight; y+=DY){
       for(int x = 0; x < lcwidth; x+=DX){
@@ -218,6 +211,7 @@ void Topo::generateNormals(){
  */
 void Topo::fillTopoArrays(uint32_t *data, unsigned int width, unsigned int height){
    //topoVertex 
+   cout << "creating triangles" << endl;
    float scale = State::topoDetailLevel; 
    float minZ = data[0];
    float maxZ = data[0];
@@ -270,11 +264,9 @@ void Topo::fillTopoArrays(uint32_t *data, unsigned int width, unsigned int heigh
    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * topoTex.size(), topoTex.data(), GL_DYNAMIC_DRAW);
    glEnableVertexAttribArray(2);
    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*) 0);
-
-   createTexture(); 
-
-   //bind null
    glBindVertexArray(0);
+   
+   createTexture(); 
 }
 void Topo::init(string filename){
    createShader();
@@ -293,6 +285,7 @@ void Topo::createShader(){
    shader->addUniform("P");
    shader->addUniform("V");
    shader->addUniform("M");
+   shader->addUniform("Texture0");
    shader->addUniform("MatDif");
    shader->addUniform("lightCol");
    shader->addUniform("MatAmb");
@@ -314,7 +307,7 @@ void Topo::render(shared_ptr<MatrixStack> Projection,
    glUniformMatrix4fv(shader->getUniform("V"), 1, GL_FALSE, value_ptr(View->topMatrix()));
    glUniformMatrix4fv(shader->getUniform("M"), 1, GL_FALSE, value_ptr(Model->topMatrix()));
    glBindVertexArray(topoVertexArrayID);
-   texture.bind(0);
+   texture.bind(shader->getUniform("Texture0"));
    glDrawArrays(GL_TRIANGLES, 0, topoVertex.size() * 3);
    glBindVertexArray(0);
    texture.unbind();
@@ -343,8 +336,6 @@ void LandType::getDrawDataForType(unsigned char type, Texture &texdest, vector<s
       meshdest = LandType::barren;  
       texdest  = LandType::barrenTex;
    } else {
-      meshdest = LandType::barren;  
-      texdest  = LandType::barrenTex;
    }  
 }
 void LandType::fillTransforms(unsigned char type, vec3 &maxrotat, vec3 &minrotat, vec3 &maxscale, vec3 &minscale){
@@ -375,6 +366,7 @@ void LandType::init(){
    shader->addUniform("MatSpec");
    shader->addUniform("shine");
    shader->addUniform("lightPos");
+   shader->addUniform("Texture0");
    shader->addAttribute("vertPos");
    shader->addAttribute("vertNor");
    shader->addAttribute("vertTex");
@@ -449,7 +441,7 @@ void LandCover::render(shared_ptr<MatrixStack> Projection,
    glUniformMatrix4fv(shader->getUniform("P"), 1, GL_FALSE, value_ptr(Projection->topMatrix()));
    glUniformMatrix4fv(shader->getUniform("V"), 1, GL_FALSE, value_ptr(View->topMatrix()));
    Model->pushMatrix();
-   texture.bind(0);
+   texture.bind(shader->getUniform("Texture0"));
    for(unsigned int i = 0; i < items.size(); i++){
       items[i]->render(Model, shader, mesh);
    }
