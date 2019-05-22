@@ -12,7 +12,7 @@ out vec3 vpos;
 void main()
 {
 	gl_Position = P * V * M * vertPos;
-	fragNor = (M * vec4(vertNor, 0.0)).xyz;
-   vpos = (M * vertPos).xyz;
+	fragNor = (V * M * vec4(vertNor, 0.0)).xyz;
+   vpos = (V * M * vertPos).xyz;
    vTexCoord = vertTex;
 }
