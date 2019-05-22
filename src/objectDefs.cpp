@@ -39,7 +39,7 @@ void setMaterial(shared_ptr<Program> p, int material){
          glUniform1f(p->getUniform("shine"), .01);
          break;
       case TOPO_MATERIAL: // topo
-         glUniform3f(p->getUniform("MatAmb"), 0.4, 0.4, 0.4);
+         glUniform3f(p->getUniform("MatAmb"), 0.2, 0.2, 0.2);
          glUniform3f(p->getUniform("MatDif"), 0.2, 0.2, 0.2);
          glUniform3f(p->getUniform("MatSpec"), 0, 0, 0);
          glUniform1f(p->getUniform("shine"), 1.0);
@@ -56,11 +56,9 @@ void readJPG(string filename, unsigned char*& data, int *width, int *height, int
       perror(filename.c_str()); 
       return;
    }
-   cout << "pcount for jpg!!";
-   cout << *width * *height << endl;
 }
 void readBin(string filename, uint32_t *&data, int *width, int *height){
-   cout << "reading bin";
+   cout << "reading bin" << endl;
    vector<uint32_t> vdata;
    ifstream file;
    file.open(filename, std::ios::binary);
@@ -71,7 +69,6 @@ void readBin(string filename, uint32_t *&data, int *width, int *height){
    file.read(oneData, sizeof(char) * 4);
    *height = *((uint32_t *)oneData);
    std::vector<unsigned char> buffer(std::istreambuf_iterator<char>(file), {});
-   cout << buffer.size() << endl;
    int npix = *width * *height;
    data = (uint32_t *) malloc(sizeof(uint32_t) * npix);
    for(int i = 0; i < buffer.size()/4; i++){
@@ -111,9 +108,9 @@ void GroundMap::generateMap(unsigned char *lcdata,
       int lcheight, 
       int demwidth, 
       int demheight){
-   int DY = 1;
-   int DX = 1;
-   float density = 1;
+   int DY = 5;
+   int DX = 5;
+   float density = 17;
    //unsigned char seen[width * height] = {};
    for(int y = 0; y < lcheight; y+=DY){
       for(int x = 0; x < lcwidth; x+=DX){
@@ -130,11 +127,11 @@ void GroundMap::generateMap(unsigned char *lcdata,
    }
 }
 void GroundMap::render(shared_ptr<MatrixStack> Projection,
-      shared_ptr<MatrixStack> View,
+      mat4 View,
       shared_ptr<MatrixStack> Model){
    Model->pushMatrix();
    for(unsigned int i = 0; i < blocks.size(); i++){
-      if(length(blocks[i]->getPosition() * State::scaler + State::viewPosition) < 100 * State::scaler){
+      if(length(blocks[i]->getPosition() * State::scaler - State::viewPosition) < 100 * State::scaler){
          blocks[i]->render(Projection, View, Model);
       }
    }
@@ -196,14 +193,14 @@ void Topo::generateNormals(){
    for(unsigned int i = 0; i < normals.size(); i+=3){
       if(i % per5 == 0){
          cout << "\r";
-         cout << (float)i / normals.size() * 100 << "%";
+         cout << (float)i / normals.size() * 100 << "%                ";
       }
       vec3 normalized = glm::normalize(vec3(normals[i+0], normals[i+1], normals[i+2]));
       normals[i + 0] = normalized[0];
       normals[i + 1] = normalized[1];
       normals[i + 2] = normalized[2];
    }
-   cout << "\r" << "      " << "\r";
+   cout << "\r" << "                       " << "\r";
    topoNormals = normals;
 }
 /*
@@ -298,13 +295,13 @@ void Topo::createShader(){
    setMaterial(shader, TOPO_MATERIAL);
 }
 void Topo::render(shared_ptr<MatrixStack> Projection,
-      shared_ptr<MatrixStack> View,
+      mat4 View,
       shared_ptr<MatrixStack> Model){
    Model->pushMatrix();
    shader->bind();
    updateLights(shader);
    glUniformMatrix4fv(shader->getUniform("P"), 1, GL_FALSE, value_ptr(Projection->topMatrix()));
-   glUniformMatrix4fv(shader->getUniform("V"), 1, GL_FALSE, value_ptr(View->topMatrix()));
+   glUniformMatrix4fv(shader->getUniform("V"), 1, GL_FALSE, value_ptr(View));
    glUniformMatrix4fv(shader->getUniform("M"), 1, GL_FALSE, value_ptr(Model->topMatrix()));
    glBindVertexArray(topoVertexArrayID);
    texture.bind(shader->getUniform("Texture0"));
@@ -434,12 +431,12 @@ void LandCover::fillItems(uint32_t *elev, unsigned int width, unsigned int heigh
    }
 }
 void LandCover::render(shared_ptr<MatrixStack> Projection,
-      shared_ptr<MatrixStack> View,
+      mat4 View,
       shared_ptr<MatrixStack> Model){
    shader->bind();
    updateLights(shader);
    glUniformMatrix4fv(shader->getUniform("P"), 1, GL_FALSE, value_ptr(Projection->topMatrix()));
-   glUniformMatrix4fv(shader->getUniform("V"), 1, GL_FALSE, value_ptr(View->topMatrix()));
+   glUniformMatrix4fv(shader->getUniform("V"), 1, GL_FALSE, value_ptr(View));
    Model->pushMatrix();
    texture.bind(shader->getUniform("Texture0"));
    for(unsigned int i = 0; i < items.size(); i++){
@@ -489,17 +486,19 @@ void Cover::render(shared_ptr<MatrixStack> Model,
 /**********************/
 
 //initial state
-vec3  State::initViewPosition = vec3(0,-13,-535);
-vec3  State::initViewRotation = vec3(0,M_PI/2,0);
+vec3  State::initViewPosition = vec3(0,0,0);
 vec3  State::initLightPos     = vec3(0,100,0);
 vec3  State::initLightCol     = vec3(1,1,1);
 float State::initScaler       = 1;
+float State::initPhi = 0;
+float State::initTheta = 0;
 
 //current state
 vec3 State::viewPosition = State::initViewPosition;
-vec3 State::viewRotation = State::initViewRotation;
 vec3 State::lightPos     = State::initLightPos;
 vec3 State::lightCol     = State::initLightCol;
+float State::phi         = State::initPhi; 
+float State::theta       = State::initTheta; 
 float State::scaler = 1;
 
 //defaults
@@ -510,11 +509,12 @@ string State::resourceDirectory = "../resources";
 string State::placeDirectory = "/.";
 
 void State::reset(){
-   State::viewPosition = State::initViewPosition;
-   State::viewRotation = State::initViewRotation;
    State::lightPos     = State::initLightPos;
    State::lightCol     = State::initLightCol;
    State::scaler       = State::initScaler;
+   State::phi          = State::initPhi;
+   State::theta        = State::initTheta;
+   State::viewPosition = State::initViewPosition;
 }
 
 

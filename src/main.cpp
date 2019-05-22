@@ -46,87 +46,44 @@ public:
    vector<shared_ptr<Updateable>> updateables;
 
    float moveDir[6] = {0,0,0,0,0,0}; //x,y,z,zrot,yrot,rot
-
-   /*
-    * escape - closes application
-    * Z - turns on wireframe
-    * X - turns off wireframe
-    * O - makes the world larger
-    * I - makes the world smaller
-    * W - looks upwards
-    * S - looks downwards
-    * A - looks left
-    * D - looks right
-    * E - moves upwrads
-    * Q - moves downwards
-    * UP ARROW - moves forwards
-    * DOWN ARROW - moves backwards
-    * RIGHT ARROW - moves right
-    * LEFT ARROW - moves left
-    */
-	void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
-	{
+   void keyCallback(GLFWwindow *window, int key, int scancode, int action, int modes){
       float delta = .1;
-		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-		{
-			glfwSetWindowShouldClose(window, GL_TRUE);
-		}
-		if (key == GLFW_KEY_Z && action == GLFW_PRESS) {
-			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-		}
-		if (key == GLFW_KEY_X && action == GLFW_PRESS) {
-			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-		}
-		if (key == GLFW_KEY_N && action == GLFW_RELEASE) {
+      if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS){
+         glfwSetWindowShouldClose(window, GL_TRUE);
+      }
+      if (key == GLFW_KEY_Z && action == GLFW_PRESS) {
+         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+      }
+      if (key == GLFW_KEY_X && action == GLFW_PRESS) {
+         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+      }
+      if (key == GLFW_KEY_N && action == GLFW_RELEASE) {
          State::scaler*=2;
-		}
-		if (key == GLFW_KEY_B && action == GLFW_RELEASE) {
+      }
+      if (key == GLFW_KEY_B && action == GLFW_RELEASE) {
          State::scaler/=2;
-		}
-      //WASD
-      if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
-         moveDir[2]=-1*delta;
       }
-      if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
-         moveDir[0]=-1*delta;
+      if(key == GLFW_KEY_M && action == GLFW_PRESS){
+         renderables[0]->updateMaterial();
       }
-      if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
-         moveDir[2]=delta;
-      }
-      if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
-         moveDir[0]=delta;
-      }
+      //WASD EQ
       if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
          moveDir[1]=-1*delta;
       }
       if (key == GLFW_KEY_E && action == GLFW_PRESS) {
          moveDir[1]=1*delta;
       }
-      if(key == GLFW_KEY_D && action == GLFW_PRESS){
-         moveDir[4]=delta;
-      }
-      if(key == GLFW_KEY_A && action == GLFW_PRESS){
-         moveDir[4]=-1*delta;
-      }
       if(key == GLFW_KEY_W && action == GLFW_PRESS){
-         moveDir[3]=-1*delta;
+         moveDir[2]=-1*delta;
       }
       if(key == GLFW_KEY_S && action == GLFW_PRESS){
-         moveDir[3]=delta;
+         moveDir[2]=delta;
       }
-
-
-      if (key == GLFW_KEY_UP && action == GLFW_RELEASE) {
-         moveDir[2]=0;
+      if(key == GLFW_KEY_D && action == GLFW_PRESS){
+         moveDir[0]=delta;
       }
-      if (key == GLFW_KEY_LEFT && action == GLFW_RELEASE) {
-         moveDir[0]=0;
-      }
-      if (key == GLFW_KEY_DOWN && action == GLFW_RELEASE) {
-         moveDir[2]=0;
-      }
-      if (key == GLFW_KEY_RIGHT && action == GLFW_RELEASE) {
-         moveDir[0]=0;
+      if(key == GLFW_KEY_A && action == GLFW_PRESS){
+         moveDir[0]=-1*delta;
       }
       if (key == GLFW_KEY_Q && action == GLFW_RELEASE) {
          moveDir[1]=0;
@@ -134,46 +91,149 @@ public:
       if (key == GLFW_KEY_E && action == GLFW_RELEASE) {
          moveDir[1]=0;
       }
-      if(key == GLFW_KEY_D && action == GLFW_RELEASE){
-         moveDir[4]=0;
-      }
-      if(key == GLFW_KEY_A && action == GLFW_RELEASE){
-         moveDir[4]=0;
-      }
       if(key == GLFW_KEY_W && action == GLFW_RELEASE){
-         moveDir[3]=0;
+         moveDir[2]=0;
       }
       if(key == GLFW_KEY_S && action == GLFW_RELEASE){
-         moveDir[3]=0;
+         moveDir[2]=0;
       }
-
+      if(key == GLFW_KEY_D && action == GLFW_RELEASE){
+         moveDir[0]=0;
+      }
+      if(key == GLFW_KEY_A && action == GLFW_RELEASE){
+         moveDir[0]=0;
+      }
       if(key == GLFW_KEY_R && action == GLFW_PRESS){
          State::reset();
       }
-
-      if(key == GLFW_KEY_J && action == GLFW_PRESS){ //light things
-         State::lightPos[0]-=20;
-      }
-      if(key == GLFW_KEY_L && action == GLFW_PRESS){
-         State::lightPos[0]+=20;
-      }
-      if(key == GLFW_KEY_I && action == GLFW_PRESS){
-         State::lightPos[2]+=20;
-      }
-      if(key == GLFW_KEY_K && action == GLFW_PRESS){
-         State::lightPos[2]-=20;
-      }
-      if(key == GLFW_KEY_U && action == GLFW_PRESS){
-         State::lightPos[1]-=20;
-      }
-      if(key == GLFW_KEY_O && action == GLFW_PRESS){
-         State::lightPos[1]+=20;
-      }
-
-      if(key == GLFW_KEY_M && action == GLFW_PRESS){
-         renderables[0]->updateMaterial();
-      }
-	}
+   }
+//   /*
+//    * escape - closes application
+//    * Z - turns on wireframe
+//    * X - turns off wireframe
+//    * O - makes the world larger
+//    * I - makes the world smaller
+//    * W - looks upwards
+//    * S - looks downwards
+//    * A - looks left
+//    * D - looks right
+//    * E - moves upwrads
+//    * Q - moves downwards
+//    * UP ARROW - moves forwards
+//    * DOWN ARROW - moves backwards
+//    * RIGHT ARROW - moves right
+//    * LEFT ARROW - moves left
+//    */
+//	void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
+//	{
+//      float delta = .1;
+//		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+//		{
+//			glfwSetWindowShouldClose(window, GL_TRUE);
+//		}
+//		if (key == GLFW_KEY_Z && action == GLFW_PRESS) {
+//			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+//		}
+//		if (key == GLFW_KEY_X && action == GLFW_PRESS) {
+//			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+//		}
+//		if (key == GLFW_KEY_N && action == GLFW_RELEASE) {
+//         State::scaler*=2;
+//		}
+//		if (key == GLFW_KEY_B && action == GLFW_RELEASE) {
+//         State::scaler/=2;
+//		}
+//      //WASD
+//      if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
+//         moveDir[2]=-1*delta;
+//      }
+//      if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
+//         moveDir[0]=-1*delta;
+//      }
+//      if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
+//         moveDir[2]=delta;
+//      }
+//      if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
+//         moveDir[0]=delta;
+//      }
+//      if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
+//         moveDir[1]=-1*delta;
+//      }
+//      if (key == GLFW_KEY_E && action == GLFW_PRESS) {
+//         moveDir[1]=1*delta;
+//      }
+//      if(key == GLFW_KEY_W && action == GLFW_PRESS){
+//         moveDir[4]=delta;
+//      }
+//      if(key == GLFW_KEY_S && action == GLFW_PRESS){
+//         moveDir[4]=-1*delta;
+//      }
+//      if(key == GLFW_KEY_D && action == GLFW_PRESS){
+//         moveDir[3]=delta;
+//      }
+//      if(key == GLFW_KEY_A && action == GLFW_PRESS){
+//         moveDir[3]=-1*delta;
+//      }
+//
+//
+//      if (key == GLFW_KEY_UP && action == GLFW_RELEASE) {
+//         moveDir[2]=0;
+//      }
+//      if (key == GLFW_KEY_LEFT && action == GLFW_RELEASE) {
+//         moveDir[0]=0;
+//      }
+//      if (key == GLFW_KEY_DOWN && action == GLFW_RELEASE) {
+//         moveDir[2]=0;
+//      }
+//      if (key == GLFW_KEY_RIGHT && action == GLFW_RELEASE) {
+//         moveDir[0]=0;
+//      }
+//      if (key == GLFW_KEY_Q && action == GLFW_RELEASE) {
+//         moveDir[1]=0;
+//      }
+//      if (key == GLFW_KEY_E && action == GLFW_RELEASE) {
+//         moveDir[1]=0;
+//      }
+//      if(key == GLFW_KEY_W && action == GLFW_RELEASE){
+//         moveDir[4]=0;
+//      }
+//      if(key == GLFW_KEY_S && action == GLFW_RELEASE){
+//         moveDir[4]=0;
+//      }
+//      if(key == GLFW_KEY_D && action == GLFW_RELEASE){
+//         moveDir[3]=0;
+//      }
+//      if(key == GLFW_KEY_A && action == GLFW_RELEASE){
+//         moveDir[3]=0;
+//      }
+//
+//      if(key == GLFW_KEY_R && action == GLFW_PRESS){
+//         State::reset();
+//      }
+//
+//      if(key == GLFW_KEY_J && action == GLFW_PRESS){ //light things
+//         State::lightPos[0]-=20;
+//      }
+//      if(key == GLFW_KEY_L && action == GLFW_PRESS){
+//         State::lightPos[0]+=20;
+//      }
+//      if(key == GLFW_KEY_I && action == GLFW_PRESS){
+//         State::lightPos[2]+=20;
+//      }
+//      if(key == GLFW_KEY_K && action == GLFW_PRESS){
+//         State::lightPos[2]-=20;
+//      }
+//      if(key == GLFW_KEY_U && action == GLFW_PRESS){
+//         State::lightPos[1]-=20;
+//      }
+//      if(key == GLFW_KEY_O && action == GLFW_PRESS){
+//         State::lightPos[1]+=20;
+//      }
+//
+//      if(key == GLFW_KEY_M && action == GLFW_PRESS){
+//         renderables[0]->updateMaterial();
+//      }
+//	}
    /*
     * clicking just moves forward by one unit right now
     */
@@ -187,6 +247,25 @@ public:
 			cout << "Pos X " << posX <<  " Pos Y " << posY << endl;
 		}
 	}
+
+   void cursorCallback(GLFWwindow *window, double xpos, double ypos){
+      int width, height;
+      glfwGetFramebufferSize(window, &width, &height);
+      double scale = 200; //State::sensitivity ?? TODO
+      double px = width / 2.0;
+      double py = height / 2.0;
+      double dx = xpos - px;
+      double dy = py - ypos;
+      State::theta+=dx/scale;
+      State::phi  +=dy/scale;
+      double rad85 = .47 * M_PI;
+      if(State::phi > rad85){
+         State::phi = rad85;
+      } else if(State::phi < -1 * rad85){
+         State::phi = -1 * rad85; 
+      }
+      glfwSetCursorPos(window, width/2, height/2);
+   }
 	void resizeCallback(GLFWwindow *window, int width, int height)
 	{
 		glViewport(0, 0, width, height);
@@ -221,7 +300,6 @@ public:
    void moveView(double dt){
       dt*=1000;
       vec3 viewPosMod = vec3(0,0,0);
-      vec3 viewRotMod = vec3(0,0,0);
       if(moveDir[0] != 0){
          viewPosMod[0] = -1*dt*moveDir[0];
       }
@@ -232,24 +310,37 @@ public:
          viewPosMod[2] =-1*dt*moveDir[2];
       }
       if(moveDir[3] != 0){
-         viewRotMod[0]=dt*moveDir[3]/100;
+         State::theta+=dt*moveDir[3]/100;
+         //viewRotMod[0]=dt*moveDir[3]/100;
       }
       if(moveDir[4] != 0){
-         viewRotMod[1]+=dt*moveDir[4]/100;
+         State::phi+=dt*moveDir[4]/100;
+         //viewRotMod[1]+=dt*moveDir[4]/100;
       }
       if(moveDir[5] != 0){
          
       }
-      State::viewRotation+=viewRotMod;
-      auto RotMat = make_shared<MatrixStack>();
-      RotMat->loadIdentity();
-      RotMat->rotate(-1 * State::viewRotation[0], vec3(1,0,0));
-      RotMat->rotate(-1 * State::viewRotation[1], vec3(0,1,0));
-      RotMat->rotate(-1 * State::viewRotation[2], vec3(0,0,1));
-      RotMat->translate(viewPosMod);
-      viewPosMod = vec3(RotMat->topMatrix()[3]);
-      State::viewPosition+=viewPosMod;
+      vec3 w = -1.0f * normalize(vec3(cos(State::phi) * cos(State::theta),sin(State::phi),cos(State::phi) * cos((M_PI/2) - State::theta)));
+      vec3 v = vec3(0,1,0);
+      vec3 u = cross(v,w);
+
+      vec3 x = vec3(1,0,0);
+      vec3 y = vec3(0,1,0);
+      vec3 z = vec3(0,0,1);
+      
+      mat3 transmat = mat3(
+         dot(u,x), dot(u,y), dot(u,z),
+         dot(v,x), dot(v,y), dot(v,z),
+         dot(w,x), dot(w,y), dot(w,z)
+      );
+      State::viewPosition-=(transmat * viewPosMod);
+      State::lightPos = worldRad * vec3(cos(phicounter) * cos(thetacounter),sin(phicounter),cos(phicounter) * cos((M_PI/2) - thetacounter));
+      //thetacounter+=M_PI/dt/10;
+      phicounter+=M_PI/10000 * dt;
    }
+   float worldRad = 1000;
+   float thetacounter = 0;
+   float phicounter = 0;
 	void render()
 	{
       //setup view and things
@@ -259,17 +350,18 @@ public:
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       float aspect = width/(float)height;
       auto Projection = make_shared<MatrixStack>();
-      auto View = make_shared<MatrixStack>();
       auto Model = make_shared<MatrixStack>();
       Projection->pushMatrix();
       Projection->perspective(45.0f, aspect, 0.01f, 100000.0f);
-      View->pushMatrix();
-      View->loadIdentity();
-      View->rotate(State::viewRotation[0], vec3(1,0,0));
-      View->rotate(State::viewRotation[1], vec3(0,1,0));
+      float radius = 2;
+      vec3 viewDir = normalize(vec3(
+         radius * cos(State::phi) * cos(State::theta),
+         radius * sin(State::phi),
+         radius * cos(State::phi) * cos((M_PI/2) - State::theta)
+      ));
+      mat4 View = glm::lookAt(State::viewPosition, State::viewPosition + viewDir, vec3(0,1,0));
       Model->pushMatrix();
          Model->loadIdentity();
-         Model->translate(State::viewPosition);
          Model->scale(vec3(State::scaler, State::scaler, State::scaler));
          for(unsigned int i = 0; i < renderables.size(); i++){
             renderables[i]->render(Projection,View,Model);

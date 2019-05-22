@@ -25,10 +25,11 @@ using std::shared_ptr;
 using std::string;
 using std::ifstream;
 using glm::vec3;
+using glm::mat4;
 
 class Renderable {
    public :
-      virtual void render(shared_ptr<MatrixStack> Projection,shared_ptr<MatrixStack> View,shared_ptr<MatrixStack> Model) = 0;
+      virtual void render(shared_ptr<MatrixStack> Projection,mat4 View,shared_ptr<MatrixStack> Model) = 0;
       virtual void updateMaterial() = 0;
 };
 class Updateable {
@@ -58,7 +59,7 @@ class Topo: public Renderable {
       int height;
       void init(string filename);
       void render(shared_ptr<MatrixStack> Projection,
-                  shared_ptr<MatrixStack> View,
+                  mat4 View,
                   shared_ptr<MatrixStack> Model);
       void updateMaterial();
 };
@@ -96,7 +97,7 @@ class LandCover {
    public :
       void init(int landType, uint32_t elev, float density, uint32_t *dem, int demwidth, int demheight, int originx, int originy, int DX, int DY);
       void render(shared_ptr<MatrixStack> Projection,
-                  shared_ptr<MatrixStack> View,
+                  mat4 View,
                   shared_ptr<MatrixStack> Model);
       vec3 getPosition();
 };
@@ -112,7 +113,7 @@ class GroundMap : public Renderable {
    public :
       void init(string lcfile, uint32_t *demdata, int demwidth, int demheight);
       void render(shared_ptr<MatrixStack> Projection,
-                  shared_ptr<MatrixStack> View,
+                  mat4 View,
                   shared_ptr<MatrixStack> Model);
       void updateMaterial();
 };
@@ -156,13 +157,15 @@ class LandType {
 class State {
    public :
       static vec3 initViewPosition;
-      static vec3 initViewRotation;
+      static float initPhi;
+      static float initTheta;
       static vec3 initLightPos;
       static vec3 initLightCol;
       static float initScaler;
       
       static vec3 viewPosition;
-      static vec3 viewRotation;
+      static float phi;
+      static float theta;
       static float scaler;
       static vec3 lightPos;
       static vec3 lightCol;
