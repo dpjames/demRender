@@ -346,17 +346,14 @@ vector<shared_ptr<LandDescription>> LandType::landDescs;
 void LandType::readAllLandTypes(){
    LandType::landDescs.reserve(N_LAND_TYPES);
    for(int i = 0; i < N_LAND_TYPES; i++){
-      //landDescs.push_back(make_shared<LandDescription>());
       LandType::landDescs.push_back(readLandDescription(i));
    }
 }
 shared_ptr<LandDescription> LandType::readLandDescription(int type){
    string pathname = State::resourceDirectory + "/LANDCOVER/" + to_string(type) + "/";
-   cout << pathname << endl;
    struct stat info;
    stat(pathname.c_str(), &info);
    if(info.st_mode & S_IFDIR){  // S_ISDIR() doesn't exist on my windows 
-      cout << pathname << " found!" << endl;
       string obj = pathname + "mesh.obj";
       string tex = pathname + "texture.jpg";
       string meta = pathname + "metadata.txt";
@@ -538,7 +535,8 @@ int State::ztrans = 0;
 int State::topoDetailLevel = 10;
 string State::resourceDirectory = "../resources";
 string State::placeDirectory = "/.";
-
+bool State::grounded = true;
+bool State::capturedCursor = true;
 void State::reset(){
    State::lightPos     = State::initLightPos;
    State::lightCol     = State::initLightCol;
@@ -623,14 +621,4 @@ void Skybox::updateMaterial(){
 }
 /**********************/
 /*  END SKYBO  CLASS  */
-/**********************/
-
-/**********************/
-/* BEGIN landde CLASS */
-/**********************/
-//shared_ptr<Program> LandDescription::shader = make_shared<Program>();
-//vector<shared_ptr<Shape>> LandDescription::mesh;
-//Texture LandDescription::texture;
-/**********************/
-/*  END lande  CLASS  */
 /**********************/

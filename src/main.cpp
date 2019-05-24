@@ -63,6 +63,9 @@ public:
       if(key == GLFW_KEY_M && action == GLFW_PRESS){
          renderables[0]->updateMaterial();
       }
+      if(key == GLFW_KEY_SPACE && action == GLFW_PRESS){
+         State::grounded = !State::grounded;
+      }
       //WASD EQ
       if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
          moveDir[1]=-1*delta;
@@ -104,133 +107,6 @@ public:
          State::reset();
       }
    }
-//   /*
-//    * escape - closes application
-//    * Z - turns on wireframe
-//    * X - turns off wireframe
-//    * O - makes the world larger
-//    * I - makes the world smaller
-//    * W - looks upwards
-//    * S - looks downwards
-//    * A - looks left
-//    * D - looks right
-//    * E - moves upwrads
-//    * Q - moves downwards
-//    * UP ARROW - moves forwards
-//    * DOWN ARROW - moves backwards
-//    * RIGHT ARROW - moves right
-//    * LEFT ARROW - moves left
-//    */
-//	void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
-//	{
-//      float delta = .1;
-//		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-//		{
-//			glfwSetWindowShouldClose(window, GL_TRUE);
-//		}
-//		if (key == GLFW_KEY_Z && action == GLFW_PRESS) {
-//			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-//		}
-//		if (key == GLFW_KEY_X && action == GLFW_PRESS) {
-//			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-//		}
-//		if (key == GLFW_KEY_N && action == GLFW_RELEASE) {
-//         State::scaler*=2;
-//		}
-//		if (key == GLFW_KEY_B && action == GLFW_RELEASE) {
-//         State::scaler/=2;
-//		}
-//      //WASD
-//      if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
-//         moveDir[2]=-1*delta;
-//      }
-//      if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
-//         moveDir[0]=-1*delta;
-//      }
-//      if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
-//         moveDir[2]=delta;
-//      }
-//      if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
-//         moveDir[0]=delta;
-//      }
-//      if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
-//         moveDir[1]=-1*delta;
-//      }
-//      if (key == GLFW_KEY_E && action == GLFW_PRESS) {
-//         moveDir[1]=1*delta;
-//      }
-//      if(key == GLFW_KEY_W && action == GLFW_PRESS){
-//         moveDir[4]=delta;
-//      }
-//      if(key == GLFW_KEY_S && action == GLFW_PRESS){
-//         moveDir[4]=-1*delta;
-//      }
-//      if(key == GLFW_KEY_D && action == GLFW_PRESS){
-//         moveDir[3]=delta;
-//      }
-//      if(key == GLFW_KEY_A && action == GLFW_PRESS){
-//         moveDir[3]=-1*delta;
-//      }
-//
-//
-//      if (key == GLFW_KEY_UP && action == GLFW_RELEASE) {
-//         moveDir[2]=0;
-//      }
-//      if (key == GLFW_KEY_LEFT && action == GLFW_RELEASE) {
-//         moveDir[0]=0;
-//      }
-//      if (key == GLFW_KEY_DOWN && action == GLFW_RELEASE) {
-//         moveDir[2]=0;
-//      }
-//      if (key == GLFW_KEY_RIGHT && action == GLFW_RELEASE) {
-//         moveDir[0]=0;
-//      }
-//      if (key == GLFW_KEY_Q && action == GLFW_RELEASE) {
-//         moveDir[1]=0;
-//      }
-//      if (key == GLFW_KEY_E && action == GLFW_RELEASE) {
-//         moveDir[1]=0;
-//      }
-//      if(key == GLFW_KEY_W && action == GLFW_RELEASE){
-//         moveDir[4]=0;
-//      }
-//      if(key == GLFW_KEY_S && action == GLFW_RELEASE){
-//         moveDir[4]=0;
-//      }
-//      if(key == GLFW_KEY_D && action == GLFW_RELEASE){
-//         moveDir[3]=0;
-//      }
-//      if(key == GLFW_KEY_A && action == GLFW_RELEASE){
-//         moveDir[3]=0;
-//      }
-//
-//      if(key == GLFW_KEY_R && action == GLFW_PRESS){
-//         State::reset();
-//      }
-//
-//      if(key == GLFW_KEY_J && action == GLFW_PRESS){ //light things
-//         State::lightPos[0]-=20;
-//      }
-//      if(key == GLFW_KEY_L && action == GLFW_PRESS){
-//         State::lightPos[0]+=20;
-//      }
-//      if(key == GLFW_KEY_I && action == GLFW_PRESS){
-//         State::lightPos[2]+=20;
-//      }
-//      if(key == GLFW_KEY_K && action == GLFW_PRESS){
-//         State::lightPos[2]-=20;
-//      }
-//      if(key == GLFW_KEY_U && action == GLFW_PRESS){
-//         State::lightPos[1]-=20;
-//      }
-//      if(key == GLFW_KEY_O && action == GLFW_PRESS){
-//         State::lightPos[1]+=20;
-//      }
-//
-//      if(key == GLFW_KEY_M && action == GLFW_PRESS){
-//         renderables[0]->updateMaterial();
-//      }
-//	}
    /*
     * clicking just moves forward by one unit right now
     */
@@ -240,8 +116,12 @@ public:
 
 		if (action == GLFW_PRESS)
 		{
-			glfwGetCursorPos(window, &posX, &posY);
-			cout << "Pos X " << posX <<  " Pos Y " << posY << endl;
+         State::capturedCursor = !State::capturedCursor;
+         if(State::capturedCursor){
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN); //TODO change this to diabled instead... documentation says this is better
+         } else {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+         }
 		}
 	}
 
@@ -261,7 +141,9 @@ public:
       } else if(State::phi < -1 * rad85){
          State::phi = -1 * rad85; 
       }
-      glfwSetCursorPos(window, width/2, height/2);
+      if(State::capturedCursor){
+         glfwSetCursorPos(window, width/2, height/2);
+      }
    }
 	void resizeCallback(GLFWwindow *window, int width, int height)
 	{
@@ -343,8 +225,9 @@ public:
       //thetacounter+=M_PI/dt/10;
       //phicounter+=M_PI/10000 * dt;
       //thetacounter+=M_PI/400000 * dt;
-
-      moveToGround();
+      if(State::grounded){
+         moveToGround();
+      }
    }
    void moveToGround(){
       unsigned int index = 
@@ -353,7 +236,7 @@ public:
       if(index >= ground->width * ground->height || index < 0){
          return;
       } 
-      State::viewPosition[1] = (ground->elevationData[index] + State::ztrans) * State::zscale * State::scaler + 2; //the 1 is the player height. right now 1 unit. TODO
+      State::viewPosition[1] = (ground->elevationData[index] + State::ztrans) * State::zscale * State::scaler + 5; //the 1 is the player height. right now 1 unit. TODO
       //(State::viewPosition[1] / State::scaler) < 
 
    }

@@ -1,0 +1,35 @@
+David James P4
+
+Usage:
+
+./demRender -p DIRECTORY_NAME -z FLOAT -d POSITIVE_INT
+
+-z defines the zscale for the elevation data. Usually this will be .001
+
+-d defined the detail level. 1 is the highest detail and looks the best, but can be hard on the GPU
+   setting this higher than 20 will lose the geometry of the landscape.
+   5 is usually pretty good, but 1 really does look the best.
+
+-p defines where within the resourses directory to look for the land information.
+   right now the only data I am submitting is for Yosemite NP (YOSEMITE_HD) and Mt Rainier NP. (RAINIER_LARGE)
+
+Reccomended runs:
+
+./demRender -p YOSEMITE_HD -d 5 -z .001
+./demRender -p RAINIER_LARGE -d 5 -z .001
+
+INPUT:
+
+by default the mouse is captured when you mouse over. to release the mouse, left click. To regrab the mouse, left click again.
+   Note, that if you aren't expecting it to grab the mouse the view could fly all over the place as you search for your mouse... if this happens just click.
+
+WASD - movement as expected
+Space - unlock your y axis from the ground plane. (allow use of E and Q)
+EQ - Move up(E) and down(q) along the y axis.
+
+B/N - change the size of the entire scene. N to increase, B to decrease
+R - reset to original view and size.
+M - change the ground material... fun to see how the light changes as you move around
+Z - turn on wireframe
+X - turn off wireframe
+   
