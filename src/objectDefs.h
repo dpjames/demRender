@@ -190,6 +190,9 @@ class State {
       static void generateOptionalMesh(string fname);
       static string placeDirectory;
       static int ztrans;
+
+      static bool grounded;
+      static bool capturedCursor;
 };
 
 
