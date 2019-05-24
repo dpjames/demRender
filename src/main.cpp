@@ -35,13 +35,10 @@ public:
 
 	// Our shader program
 	std::shared_ptr<Program> prog;
-
 	// Shape to be used (from  file) - modify to support multiple
 
-	vector<shared_ptr<Shape>> birdMesh;
-	vector<shared_ptr<Shape>> treeMesh;
-   vector<vector<GLfloat>> trees;
-
+   shared_ptr<Topo> ground;
+   
    vector<shared_ptr<Renderable>> renderables;
    vector<shared_ptr<Updateable>> updateables;
 
@@ -283,13 +280,21 @@ public:
 	}
    GLfloat LY = 10;
 	void initSceneObjects(){
-      shared_ptr<Topo> ground = make_shared<Topo>();
+      ground = make_shared<Topo>();
       ground->init(State::resourceDirectory + State::placeDirectory + "/topo.bin"); 
+      State::initViewPosition = vec3(ground->width/2, 0, ground->height/2);
+      State::viewPosition = State::initViewPosition;
       renderables.push_back((shared_ptr<Renderable>)ground);
-      
+
+
       shared_ptr<GroundMap> groundMap = make_shared<GroundMap>();
       groundMap->init(State::resourceDirectory + State::placeDirectory + "/landcover.jpg", ground->elevationData, ground->width, ground->height);
       renderables.push_back((shared_ptr<Renderable>)groundMap);
+
+
+      shared_ptr<Skybox> sky = make_shared<Skybox>();
+      sky->init();
+      renderables.push_back((shared_ptr<Renderable>)sky);
       
    }
    /*
@@ -337,6 +342,20 @@ public:
       State::lightPos = worldRad * vec3(cos(phicounter) * cos(thetacounter),sin(phicounter),cos(phicounter) * cos((M_PI/2) - thetacounter));
       //thetacounter+=M_PI/dt/10;
       phicounter+=M_PI/10000 * dt;
+      thetacounter+=M_PI/400000 * dt;
+
+      moveToGround();
+   }
+   void moveToGround(){
+      unsigned int index = 
+         ((int)(State::viewPosition[0] / State::scaler)) + 
+         ((int)(State::viewPosition[2] / State::scaler) * ground->width);
+      if(index >= ground->width * ground->height || index < 0){
+         return;
+      } 
+      State::viewPosition[1] = (ground->elevationData[index] + State::ztrans) * State::zscale * State::scaler + 2; //the 1 is the player height. right now 1 unit. TODO
+      //(State::viewPosition[1] / State::scaler) < 
+
    }
    float worldRad = 1000;
    float thetacounter = 0;
@@ -352,7 +371,7 @@ public:
       auto Projection = make_shared<MatrixStack>();
       auto Model = make_shared<MatrixStack>();
       Projection->pushMatrix();
-      Projection->perspective(45.0f, aspect, 0.01f, 100000.0f);
+      Projection->perspective(45.0f, aspect, 0.01f, 100000.0f * State::scaler);
       float radius = 2;
       vec3 viewDir = normalize(vec3(
          radius * cos(State::phi) * cos(State::theta),
