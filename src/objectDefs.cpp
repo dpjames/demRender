@@ -110,7 +110,7 @@ void GroundMap::generateMap(unsigned char *lcdata,
       int demheight){
    int DY = 5;
    int DX = 5;
-   float density = 17;
+   float density = 50;
    //unsigned char seen[width * height] = {};
    for(int y = 0; y < lcheight; y+=DY){
       for(int x = 0; x < lcwidth; x+=DX){
@@ -121,7 +121,7 @@ void GroundMap::generateMap(unsigned char *lcdata,
          unsigned char type = lcdata[lcindex];
          unsigned char elev = demdata[demindex];
          shared_ptr<LandCover> block = make_shared<LandCover>();
-         block->init(type, elev, density, demdata, demwidth, demheight, wx, wy, DX, DY);
+         block->init(type, elev, density, demdata, demwidth, demheight, wx, wy, DX/(float)lcwidth * demwidth, DY/(float)lcheight * demheight);
          blocks.push_back(block);
       }
    }
@@ -520,6 +520,78 @@ void State::reset(){
 
 /**********************/
 /*  END State  CLASS  */
+/**********************/
+
+/**********************/
+/* BEGIN SKYBO  CLASS */
+/**********************/
+void Skybox::init(){
+   vector<std::string> faces {
+      "right.jpg",
+      "left.jpg",
+      "up.jpg",
+      "down.jpg",
+      "front.jpg",
+      "back.jpg"
+   }; 
+   readObj(State::resourceDirectory + "/skybox/cube.obj", mesh);
+   createSky(State::resourceDirectory + "/skybox/", faces);
+   createShader();
+}
+void Skybox::createSky(string dir, vector<string> faces) {
+   glGenTextures(1, &textureID);
+   glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+   int width, height, nrChannels;
+   stbi_set_flip_vertically_on_load(false);
+   for(GLuint i = 0; i < faces.size(); i++) {
+      unsigned char *data =
+         stbi_load((dir+faces[i]).c_str(), &width, &height, &nrChannels, 0);
+      if (data) {
+         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+               0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+      } else {
+         cout << "failed to load: " << (dir+faces[i]).c_str() << endl;
+      }
+   }
+   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+   cout << " creating cube map any errors : " << glGetError() << endl;
+} 
+void Skybox::createShader(){
+   shader = make_shared<Program>();
+   shader->setVerbose(true);
+   shader->setShaderNames(State::resourceDirectory + "/skybox/skybox_vert.glsl", State::resourceDirectory + "/skybox/skybox_frag.glsl");
+   shader->init();
+   shader->addUniform("P");
+   shader->addUniform("V");
+   shader->addUniform("M");
+   shader->addUniform("skybox");
+   shader->addAttribute("vertPos");
+   shader->addAttribute("vertNor");
+   shader->addAttribute("vertTex");
+}
+void Skybox::render(shared_ptr<MatrixStack> Projection,mat4 View,shared_ptr<MatrixStack> Model){
+   Model->pushMatrix();
+      shader->bind();
+      Model->scale(vec3(10000*State::scaler,10000*State::scaler,10000*State::scaler)); 
+      glUniformMatrix4fv(shader->getUniform("P"), 1, GL_FALSE, value_ptr(Projection->topMatrix()));
+      glDepthFunc(GL_LEQUAL);
+      glUniformMatrix4fv(shader->getUniform("V"), 1, GL_FALSE, value_ptr(View));
+      glUniformMatrix4fv(shader->getUniform("M"), 1, GL_FALSE, value_ptr(Model->topMatrix()));
+      glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+      mesh[0]->draw(shader);
+      shader->unbind();
+      glDepthFunc(GL_LESS);
+   Model->popMatrix();
+}
+void Skybox::updateMaterial(){
+
+}
+/**********************/
+/*  END SKYBO  CLASS  */
 /**********************/
 
 

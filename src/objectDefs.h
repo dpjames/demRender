@@ -137,7 +137,7 @@ class GroundMap : public Renderable {
 #define PASTURE 81
 #define CROPS 82
 #define WOODED_WETLANDS 90
-#define WELAND 95
+#define WETLAND 95
 class LandType {
    private :
       static vector<shared_ptr<Shape>> tree;
@@ -177,4 +177,19 @@ class State {
       static string placeDirectory;
       static int ztrans;
 };
+
+
+class Skybox : public Renderable{
+   private :
+      void createSky(string dir, vector<string> faces);
+      void createShader();
+      unsigned int textureID;
+	   shared_ptr<Program> shader;
+      vector<shared_ptr<Shape>> mesh;
+   public :
+      void init();
+      void render(shared_ptr<MatrixStack> Projection,mat4 View,shared_ptr<MatrixStack> Model);
+      void updateMaterial();
+};
 #endif
+
