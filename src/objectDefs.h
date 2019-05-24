@@ -19,11 +19,14 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "stb_image.h"
-
+#include <sys/types.h>
+#include <sys/stat.h>
 using std::vector;
 using std::shared_ptr;
 using std::string;
 using std::ifstream;
+using std::to_string;
+using std::fstream;
 using glm::vec3;
 using glm::mat4;
 
@@ -138,19 +141,30 @@ class GroundMap : public Renderable {
 #define CROPS 82
 #define WOODED_WETLANDS 90
 #define WETLAND 95
+#define N_LAND_TYPES 100
+class LandDescription { //ehh this is more of a struct but hey.
+   public : 
+	   shared_ptr<Program> shader;
+      vector<shared_ptr<Shape>> mesh;
+      vec3 maxrotat;
+      vec3 minrotat;
+      vec3 minscale;
+      vec3 maxscale;
+      Texture texture;
+};
 class LandType {
    private :
-      static vector<shared_ptr<Shape>> tree;
-      static vector<shared_ptr<Shape>> sphere;
-      static vector<shared_ptr<Shape>> barren;
-      static Texture treeTex;
-      static Texture barrenTex;
+      static vector<shared_ptr<LandDescription>> landDescs;
+      static void readAllLandTypes();
+      static shared_ptr<LandDescription> readLandDescription(int type);
+      static void LandType::readMetaFile(string fname, shared_ptr<LandDescription> ld);
    public :
       static void fillTransforms(unsigned char type, vec3 &maxrotat, vec3 &minrotat, 
                                  vec3 &minscale, vec3 &maxscale);
       static void getDrawDataForType(unsigned char type, Texture &texdest, vector<shared_ptr<Shape>> &meshdest);
 	   static shared_ptr<Program> shader;
       static void init();
+      
 };
 
 
@@ -191,5 +205,7 @@ class Skybox : public Renderable{
       void render(shared_ptr<MatrixStack> Projection,mat4 View,shared_ptr<MatrixStack> Model);
       void updateMaterial();
 };
+
+
 #endif
 
