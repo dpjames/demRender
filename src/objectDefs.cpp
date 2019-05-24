@@ -110,7 +110,7 @@ void GroundMap::generateMap(unsigned char *lcdata,
       int demheight){
    int DY = 5;
    int DX = 5;
-   float density = 50;
+   float density = 20;
    //unsigned char seen[width * height] = {};
    for(int y = 0; y < lcheight; y+=DY){
       for(int x = 0; x < lcwidth; x+=DX){
@@ -320,39 +320,78 @@ void Topo::render(shared_ptr<MatrixStack> Projection,
 /* BEGIN LATYPE CLASS */
 /**********************/
 shared_ptr<Program> LandType::shader = make_shared<Program>(); //TODO generalize to all shaders
-vector<shared_ptr<Shape>> LandType::tree;
-vector<shared_ptr<Shape>> LandType::sphere;
-vector<shared_ptr<Shape>> LandType::barren;
-Texture LandType::treeTex;
-Texture LandType::barrenTex;
 void LandType::getDrawDataForType(unsigned char type, Texture &texdest, vector<shared_ptr<Shape>> &meshdest){
-    if(type == EVERGREEN_FOREST){
-      meshdest = LandType::tree; 
-      texdest  = LandType::treeTex;
-   } else if(type == BARREN_LAND) {
-      meshdest = LandType::barren;  
-      texdest  = LandType::barrenTex;
-   } else {
-   }  
-}
-void LandType::fillTransforms(unsigned char type, vec3 &maxrotat, vec3 &minrotat, vec3 &maxscale, vec3 &minscale){
-   maxrotat = vec3(0,0,0);
-   minrotat = vec3(0,0,0);
-   minscale = vec3(.2,.2,.2);
-   maxscale = vec3(.2,.3,.2);
-   if(type != EVERGREEN_FOREST){
-      minscale = vec3(1,1,1);
-      maxscale = vec3(1,1,1);
+   if(landDescs[type] != NULL){
+      texdest = landDescs[type]->texture;
+      meshdest = landDescs[type]->mesh;
    }
 }
-
+void LandType::fillTransforms(unsigned char type, vec3 &maxrotat, vec3 &minrotat, vec3 &maxscale, vec3 &minscale){
+   //maxrotat = vec3(0,0,0);
+   //minrotat = vec3(0,0,0);
+   //minscale = vec3(.2,.2,.2);
+   //maxscale = vec3(.2,.3,.2);
+   //if(type != EVERGREEN_FOREST){
+   //   minscale = vec3(1,1,1);
+   //   maxscale = vec3(1,1,1);
+   //}
+   if(landDescs[type] != NULL){
+      maxrotat = landDescs[type]->maxrotat;
+      minrotat = landDescs[type]->minrotat;
+      maxscale = landDescs[type]->maxscale;
+      minscale = landDescs[type]->minscale;
+   }
+}
+vector<shared_ptr<LandDescription>> LandType::landDescs;
+void LandType::readAllLandTypes(){
+   LandType::landDescs.reserve(N_LAND_TYPES);
+   for(int i = 0; i < N_LAND_TYPES; i++){
+      //landDescs.push_back(make_shared<LandDescription>());
+      LandType::landDescs.push_back(readLandDescription(i));
+   }
+}
+shared_ptr<LandDescription> LandType::readLandDescription(int type){
+   string pathname = State::resourceDirectory + "/LANDCOVER/" + to_string(type) + "/";
+   cout << pathname << endl;
+   struct stat info;
+   stat(pathname.c_str(), &info);
+   if(info.st_mode & S_IFDIR){  // S_ISDIR() doesn't exist on my windows 
+      cout << pathname << " found!" << endl;
+      string obj = pathname + "mesh.obj";
+      string tex = pathname + "texture.jpg";
+      string meta = pathname + "metadata.txt";
+      shared_ptr<LandDescription> ld = make_shared<LandDescription>();
+      readObj(obj, ld->mesh);
+      ld->texture.setFilename(tex);
+      ld->texture.init();
+      ld->texture.setWrapModes(GL_REPEAT,GL_REPEAT);
+      readMetaFile(meta, ld);
+      return ld;
+   }
+   return NULL;
+}
+void LandType::readMetaFile(string fname, shared_ptr<LandDescription> ld){
+   fstream meta;
+   meta.open(fname);
+   vec3 *locs[4] = {
+      &(ld->minrotat),
+      &(ld->maxrotat),
+      &(ld->minscale),
+      &(ld->maxscale)
+   };
+   for(int i = 0; i < 4; i++){ //read in 4 vec3
+      string v1,v2,v3;
+      meta >> v1;
+      meta >> v2;
+      meta >> v3;
+      *(locs[i]) = vec3(stof(v1), stof(v2), stof(v3));
+   }
+}
 void LandType::init(){
-   readObj(State::resourceDirectory + "/plants/tree.obj", tree); //TODO generalize to all mesh
-   readObj(State::resourceDirectory + "/sphere.obj", sphere); //TODO generalize to all mesh
-   readObj(State::resourceDirectory + "/barren.obj", barren); //TODO generalize to all mesh
+   readAllLandTypes();
    shader = make_shared<Program>();
    shader->setVerbose(true);
-   shader->setShaderNames(State::resourceDirectory + "/tree_vert.glsl", State::resourceDirectory + "/tree_frag.glsl");
+   shader->setShaderNames(State::resourceDirectory + "/land_vert.glsl", State::resourceDirectory + "/land_frag.glsl");
    shader->init();
    shader->addUniform("P");
    shader->addUniform("V");
@@ -367,15 +406,7 @@ void LandType::init(){
    shader->addAttribute("vertPos");
    shader->addAttribute("vertNor");
    shader->addAttribute("vertTex");
-
-   treeTex.setFilename(State::resourceDirectory + "/plants/tree.tex.jpg");
-   treeTex.init();
-   treeTex.setWrapModes(GL_REPEAT, GL_REPEAT);
-   barrenTex.setFilename(State::resourceDirectory + "/barren.jpg");
-   barrenTex.init();
-   barrenTex.setWrapModes(GL_REPEAT, GL_REPEAT);
-
-   setMaterial(shader, 1);
+   setMaterial(shader, TOPO_MATERIAL);
 }
 
 /**********************/
@@ -487,7 +518,7 @@ void Cover::render(shared_ptr<MatrixStack> Model,
 
 //initial state
 vec3  State::initViewPosition = vec3(0,0,0);
-vec3  State::initLightPos     = vec3(0,100,0);
+vec3  State::initLightPos     = vec3(-1000,10000,-1000);
 vec3  State::initLightCol     = vec3(1,1,1);
 float State::initScaler       = 1;
 float State::initPhi = 0;
@@ -594,4 +625,12 @@ void Skybox::updateMaterial(){
 /*  END SKYBO  CLASS  */
 /**********************/
 
-
+/**********************/
+/* BEGIN landde CLASS */
+/**********************/
+//shared_ptr<Program> LandDescription::shader = make_shared<Program>();
+//vector<shared_ptr<Shape>> LandDescription::mesh;
+//Texture LandDescription::texture;
+/**********************/
+/*  END lande  CLASS  */
+/**********************/

@@ -339,10 +339,10 @@ public:
          dot(w,x), dot(w,y), dot(w,z)
       );
       State::viewPosition-=(transmat * viewPosMod);
-      State::lightPos = worldRad * vec3(cos(phicounter) * cos(thetacounter),sin(phicounter),cos(phicounter) * cos((M_PI/2) - thetacounter));
+      //State::lightPos = worldRad * vec3(cos(phicounter) * cos(thetacounter),sin(phicounter),cos(phicounter) * cos((M_PI/2) - thetacounter));
       //thetacounter+=M_PI/dt/10;
-      phicounter+=M_PI/10000 * dt;
-      thetacounter+=M_PI/400000 * dt;
+      //phicounter+=M_PI/10000 * dt;
+      //thetacounter+=M_PI/400000 * dt;
 
       moveToGround();
    }

@@ -3,6 +3,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommand>$(TargetPath)</LocalDebuggerCommand>
-    <LocalDebuggerCommandArguments>-d 1 -z .001 -p YOSEMITE_HD</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-d 10 -z .001 -p YOSEMITE_HD</LocalDebuggerCommandArguments>
   </PropertyGroup>
 </Project>
