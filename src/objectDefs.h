@@ -157,7 +157,7 @@ class LandType {
       static vector<shared_ptr<LandDescription>> landDescs;
       static void readAllLandTypes();
       static shared_ptr<LandDescription> readLandDescription(int type);
-      static void LandType::readMetaFile(string fname, shared_ptr<LandDescription> ld);
+      static void readMetaFile(string fname, shared_ptr<LandDescription> ld);
    public :
       static void fillTransforms(unsigned char type, vec3 &maxrotat, vec3 &minrotat, 
                                  vec3 &minscale, vec3 &maxscale);

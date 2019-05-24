@@ -71,7 +71,7 @@ void readBin(string filename, uint32_t *&data, int *width, int *height){
    std::vector<unsigned char> buffer(std::istreambuf_iterator<char>(file), {});
    int npix = *width * *height;
    data = (uint32_t *) malloc(sizeof(uint32_t) * npix);
-   for(int i = 0; i < buffer.size()/4; i++){
+   for(unsigned int i = 0; i < buffer.size()/4; i++){
       data[i] = ((uint32_t *)buffer.data())[i];
    }
 }
@@ -110,7 +110,7 @@ void GroundMap::generateMap(unsigned char *lcdata,
       int demheight){
    int DY = 5;
    int DX = 5;
-   float density = 20;
+   float density = 5;
    //unsigned char seen[width * height] = {};
    for(int y = 0; y < lcheight; y+=DY){
       for(int x = 0; x < lcwidth; x+=DX){
@@ -352,7 +352,9 @@ void LandType::readAllLandTypes(){
 shared_ptr<LandDescription> LandType::readLandDescription(int type){
    string pathname = State::resourceDirectory + "/LANDCOVER/" + to_string(type) + "/";
    struct stat info;
-   stat(pathname.c_str(), &info);
+   if(stat(pathname.c_str(), &info) == -1){
+      return NULL;
+   }
    if(info.st_mode & S_IFDIR){  // S_ISDIR() doesn't exist on my windows 
       string obj = pathname + "mesh.obj";
       string tex = pathname + "texture.jpg";
@@ -381,6 +383,7 @@ void LandType::readMetaFile(string fname, shared_ptr<LandDescription> ld){
       meta >> v1;
       meta >> v2;
       meta >> v3;
+      //cout << v1 << "," << v2 << "," << v3 << endl;
       *(locs[i]) = vec3(stof(v1), stof(v2), stof(v3));
    }
 }
