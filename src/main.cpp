@@ -128,7 +128,7 @@ public:
    void cursorCallback(GLFWwindow *window, double xpos, double ypos){
       int width, height;
       glfwGetFramebufferSize(window, &width, &height);
-      double scale = 200; //State::sensitivity ?? TODO
+      double scale = 900; //State::sensitivity ?? TODO
       double px = width / 2.0;
       double py = height / 2.0;
       double dx = xpos - px;
@@ -236,7 +236,7 @@ public:
       if(index >= ground->width * ground->height || index < 0){
          return;
       } 
-      State::viewPosition[1] = (ground->elevationData[index] + State::ztrans) * State::zscale * State::scaler + 5; //the 1 is the player height. right now 1 unit. TODO
+      State::viewPosition[1] = (ground->elevationData[index] + State::ztrans) * State::zscale * State::scaler + .1; //the 1 is the player height. right now 1 unit. TODO
       //(State::viewPosition[1] / State::scaler) < 
 
    }

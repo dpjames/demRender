@@ -141,7 +141,7 @@ class GroundMap : public Renderable {
 #define CROPS 82
 #define WOODED_WETLANDS 90
 #define WETLAND 95
-#define N_LAND_TYPES 100
+#define N_LAND_TYPES 200
 class LandDescription { //ehh this is more of a struct but hey.
    public : 
 	   shared_ptr<Program> shader;
