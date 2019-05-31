@@ -141,7 +141,7 @@ class GroundMap : public Renderable {
 #define CROPS 82
 #define WOODED_WETLANDS 90
 #define WETLAND 95
-#define N_LAND_TYPES 100
+#define N_LAND_TYPES 200
 class LandDescription { //ehh this is more of a struct but hey.
    public : 
 	   shared_ptr<Program> shader;
@@ -157,7 +157,7 @@ class LandType {
       static vector<shared_ptr<LandDescription>> landDescs;
       static void readAllLandTypes();
       static shared_ptr<LandDescription> readLandDescription(int type);
-      static void LandType::readMetaFile(string fname, shared_ptr<LandDescription> ld);
+      static void readMetaFile(string fname, shared_ptr<LandDescription> ld);
    public :
       static void fillTransforms(unsigned char type, vec3 &maxrotat, vec3 &minrotat, 
                                  vec3 &minscale, vec3 &maxscale);
