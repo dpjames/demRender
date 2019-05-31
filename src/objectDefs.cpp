@@ -108,9 +108,10 @@ void GroundMap::generateMap(unsigned char *lcdata,
       int lcheight, 
       int demwidth, 
       int demheight){
-   int DY = 5;
-   int DX = 5;
-   float density = 5;
+   cout << "generating ground map" << endl;
+   int DY = 1;
+   int DX = 1;
+   float density = 8;
    //unsigned char seen[width * height] = {};
    for(int y = 0; y < lcheight; y+=DY){
       for(int x = 0; x < lcwidth; x+=DX){
@@ -131,7 +132,9 @@ void GroundMap::render(shared_ptr<MatrixStack> Projection,
       shared_ptr<MatrixStack> Model){
    Model->pushMatrix();
    for(unsigned int i = 0; i < blocks.size(); i++){
-      if(length(blocks[i]->getPosition() * State::scaler - State::viewPosition) < 100 * State::scaler){
+      vec3 dvec = blocks[i]->getPosition() * State::scaler - State::viewPosition;
+      float dist = sqrt(pow(dvec[0],2) + pow(dvec[2],2));
+      if(dist < 50 * State::scaler){
          blocks[i]->render(Projection, View, Model);
       }
    }
@@ -422,7 +425,7 @@ void LandCover::init(int landType, uint32_t elev, float indensity, uint32_t *dem
    LandType::getDrawDataForType(landType, texture, mesh);
    density = indensity;  
    minTrans = vec3(originx - DX, elev, originy - DY);
-   maxTrans = vec3(originy + DX, elev, originy + DY);
+   maxTrans = vec3(originx + DX, elev, originy + DY);
    LandType::fillTransforms(landType, maxRotat, minRotat, maxScale, minScale);
    globalTrans = vec3(0,0,0); // this will prob be removed  TODO
    globalScale = vec3(1,1,1); // this will prob be removed
@@ -430,7 +433,7 @@ void LandCover::init(int landType, uint32_t elev, float indensity, uint32_t *dem
    fillItems(dem, demwidth, demheight, originx, originy);
 }
 vec3 LandCover::getPosition(){
-   return minTrans;
+   return (minTrans + maxTrans) / 2.0f;
 }
 void LandCover::fillItems(uint32_t *elev, unsigned int width, unsigned int height, unsigned int originx, unsigned int originy){
    GLfloat tx,ty,tz,sx,sy,sz,rx,ry,rz;
@@ -519,7 +522,7 @@ void Cover::render(shared_ptr<MatrixStack> Model,
 //initial state
 vec3  State::initViewPosition = vec3(0,0,0);
 vec3  State::initLightPos     = vec3(-1000,10000,-1000);
-vec3  State::initLightCol     = vec3(1,1,1);
+vec3  State::initLightCol     = vec3(1.2,1.2,1.2);
 float State::initScaler       = 1;
 float State::initPhi = 0;
 float State::initTheta = 0;
