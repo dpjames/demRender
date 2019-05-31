@@ -10,13 +10,20 @@ Usage:
    setting this higher than 20 will lose the geometry of the landscape.
    5 is usually pretty good, but 1 really does look the best.
 
--p defines where within the resourses directory to look for the land information.
+-p defines where within the resources directory to look for the land information.
    right now the only data I am submitting is for Yosemite NP (YOSEMITE_HD) and Mt Rainier NP. (RAINIER_LARGE)
 
-Reccomended runs:
+Recommended runs:
 
 ./demRender -p YOSEMITE_HD -d 5 -z .001
 ./demRender -p RAINIER_LARGE -d 5 -z .001
+
+It takes a second to load up, since the areas are pretty large and it calculates a lot of normals. Setting -d higher will reduce load times.
+Also models load in based on your proximity to them, so as you approach different areas, different models will appear.
+These models are generated based on the actual landcover data from USGS. Right now only 5 of the types are implemented, but
+the infrastructure is in place to add the rest by simply creating the obj file. (The code looks in a specified folder (resources/LANDCOVER) for keys and values to generate the models)
+I am looking for a way to reduce all the draw calls to boost performance dramatically. 
+Have fun!
 
 INPUT:
 
