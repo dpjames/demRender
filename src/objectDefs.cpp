@@ -71,7 +71,7 @@ void readBin(string filename, uint32_t *&data, int *width, int *height){
    std::vector<unsigned char> buffer(std::istreambuf_iterator<char>(file), {});
    int npix = *width * *height;
    data = (uint32_t *) malloc(sizeof(uint32_t) * npix);
-   for(int i = 0; i < buffer.size()/4; i++){
+   for(unsigned int i = 0; i < buffer.size()/4; i++){
       data[i] = ((uint32_t *)buffer.data())[i];
    }
 }
@@ -108,9 +108,10 @@ void GroundMap::generateMap(unsigned char *lcdata,
       int lcheight, 
       int demwidth, 
       int demheight){
-   int DY = 5;
-   int DX = 5;
-   float density = 20;
+   cout << "generating ground map" << endl;
+   int DY = 1;
+   int DX = 1;
+   float density = 8;
    //unsigned char seen[width * height] = {};
    for(int y = 0; y < lcheight; y+=DY){
       for(int x = 0; x < lcwidth; x+=DX){
@@ -131,7 +132,9 @@ void GroundMap::render(shared_ptr<MatrixStack> Projection,
       shared_ptr<MatrixStack> Model){
    Model->pushMatrix();
    for(unsigned int i = 0; i < blocks.size(); i++){
-      if(length(blocks[i]->getPosition() * State::scaler - State::viewPosition) < 100 * State::scaler){
+      vec3 dvec = blocks[i]->getPosition() * State::scaler - State::viewPosition;
+      float dist = sqrt(pow(dvec[0],2) + pow(dvec[2],2));
+      if(dist < 50 * State::scaler){
          blocks[i]->render(Projection, View, Model);
       }
    }
@@ -352,7 +355,9 @@ void LandType::readAllLandTypes(){
 shared_ptr<LandDescription> LandType::readLandDescription(int type){
    string pathname = State::resourceDirectory + "/LANDCOVER/" + to_string(type) + "/";
    struct stat info;
-   stat(pathname.c_str(), &info);
+   if(stat(pathname.c_str(), &info) == -1){
+      return NULL;
+   }
    if(info.st_mode & S_IFDIR){  // S_ISDIR() doesn't exist on my windows 
       string obj = pathname + "mesh.obj";
       string tex = pathname + "texture.jpg";
@@ -381,6 +386,7 @@ void LandType::readMetaFile(string fname, shared_ptr<LandDescription> ld){
       meta >> v1;
       meta >> v2;
       meta >> v3;
+      //cout << v1 << "," << v2 << "," << v3 << endl;
       *(locs[i]) = vec3(stof(v1), stof(v2), stof(v3));
    }
 }
@@ -419,7 +425,7 @@ void LandCover::init(int landType, uint32_t elev, float indensity, uint32_t *dem
    LandType::getDrawDataForType(landType, texture, mesh);
    density = indensity;  
    minTrans = vec3(originx - DX, elev, originy - DY);
-   maxTrans = vec3(originy + DX, elev, originy + DY);
+   maxTrans = vec3(originx + DX, elev, originy + DY);
    LandType::fillTransforms(landType, maxRotat, minRotat, maxScale, minScale);
    globalTrans = vec3(0,0,0); // this will prob be removed  TODO
    globalScale = vec3(1,1,1); // this will prob be removed
@@ -427,7 +433,7 @@ void LandCover::init(int landType, uint32_t elev, float indensity, uint32_t *dem
    fillItems(dem, demwidth, demheight, originx, originy);
 }
 vec3 LandCover::getPosition(){
-   return minTrans;
+   return (minTrans + maxTrans) / 2.0f;
 }
 void LandCover::fillItems(uint32_t *elev, unsigned int width, unsigned int height, unsigned int originx, unsigned int originy){
    GLfloat tx,ty,tz,sx,sy,sz,rx,ry,rz;
@@ -516,7 +522,7 @@ void Cover::render(shared_ptr<MatrixStack> Model,
 //initial state
 vec3  State::initViewPosition = vec3(0,0,0);
 vec3  State::initLightPos     = vec3(-1000,10000,-1000);
-vec3  State::initLightCol     = vec3(1,1,1);
+vec3  State::initLightCol     = vec3(1.2,1.2,1.2);
 float State::initScaler       = 1;
 float State::initPhi = 0;
 float State::initTheta = 0;
