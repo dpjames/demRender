@@ -513,7 +513,23 @@ void Cover::render(shared_ptr<MatrixStack> Model,
 /*  END COVER  CLASS  */
 /**********************/
 
+/**********************/
+/* Begin Player Class */
+/**********************/
+void Player::init(int x, int y, int z){
+   velocity = vec3(0,0,1);
+   acceleration = vec3(0,0,0);
+   position = vec3(x,y,z)
 
+}
+void Player::updateMaterial(){}
+void Player::render(shared_ptr<MatrixStack> Projection,mat4 View,shared_ptr<MatrixStack> Model){
+}
+
+
+/**********************/
+/* End Player Class   */
+/**********************/
 
 /**********************/
 /* Begin State CLASS  */
@@ -526,6 +542,9 @@ vec3  State::initLightCol     = vec3(1.2,1.2,1.2);
 float State::initScaler       = 1;
 float State::initPhi = 0;
 float State::initTheta = 0;
+
+
+
 
 //current state
 vec3 State::viewPosition = State::initViewPosition;
@@ -541,7 +560,7 @@ int State::ztrans = 0;
 int State::topoDetailLevel = 10;
 string State::resourceDirectory = "../resources";
 string State::placeDirectory = "/.";
-bool State::grounded = true;
+bool State::grounded = false;
 bool State::capturedCursor = true;
 void State::reset(){
    State::lightPos     = State::initLightPos;

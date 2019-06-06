@@ -209,6 +209,17 @@ class Skybox : public Renderable{
       void updateMaterial();
 };
 
+class Player : public Renderable, Updateable {
+   private : 
+      vec3 velocity;
+      vec3 acceleration;
+      vec3 position;
+   public :
+      void init(int x, int y, int z);
+      void render(shared_ptr<MatrixStack> Projection,mat4 View,shared_ptr<MatrixStack> Model);
+      void updateMaterial();
+      void update(double dt);
+};
 
 #endif
 
