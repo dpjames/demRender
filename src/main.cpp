@@ -236,7 +236,7 @@ public:
       if(index >= ground->width * ground->height || index < 0){
          return;
       } 
-      State::viewPosition[1] = (ground->elevationData[index] + State::ztrans) * State::zscale * State::scaler + .1; //the 1 is the player height. right now 1 unit. TODO
+      State::viewPosition[1] = (ground->elevationData[index] + State::ztrans) * State::zscale * State::scaler + 3; //the 1 is the player height. right now 1 unit. TODO
       //(State::viewPosition[1] / State::scaler) < 
 
    }
