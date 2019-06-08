@@ -214,8 +214,10 @@ class Player : public Renderable, Updateable {
       vec3 velocity;
       vec3 acceleration;
       vec3 position;
+	   shared_ptr<Program> shader;
+      vector<shared_ptr<Shape>> mesh;
    public :
-      void init(int x, int y, int z);
+      void init(vec3 pos);
       void render(shared_ptr<MatrixStack> Projection,mat4 View,shared_ptr<MatrixStack> Model);
       void updateMaterial();
       void update(double dt);
