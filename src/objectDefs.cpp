@@ -109,8 +109,8 @@ void GroundMap::generateMap(unsigned char *lcdata,
       int demwidth, 
       int demheight){
    cout << "generating ground map" << endl;
-   int DY = 1;
-   int DX = 1;
+   int DY = 100;
+   int DX = 100;
    float density = 8;
    //unsigned char seen[width * height] = {};
    for(int y = 0; y < lcheight; y+=DY){
@@ -516,14 +516,49 @@ void Cover::render(shared_ptr<MatrixStack> Model,
 /**********************/
 /* Begin Player Class */
 /**********************/
-void Player::init(int x, int y, int z){
+void Player::init(vec3 pos){
    velocity = vec3(0,0,1);
    acceleration = vec3(0,0,0);
-   position = vec3(x,y,z)
+   position = pos;
 
+   //model
+   readObj(State::resourceDirectory + "/skybox/cube.obj", mesh); //TODO cahnge  this
+
+   //shader
+   shader = make_shared<Program>();
+   shader->setVerbose(true);
+   shader->setShaderNames(State::resourceDirectory + "/plane_vert.glsl", State::resourceDirectory + "/plane_frag.glsl");
+   shader->init();
+   shader->addUniform("P");
+   shader->addUniform("V");
+   shader->addUniform("M");
+   shader->addUniform("MatDif");
+   shader->addUniform("lightCol");
+   shader->addUniform("MatAmb");
+   shader->addUniform("MatSpec");
+   shader->addUniform("shine");
+   shader->addUniform("lightPos");
+   shader->addAttribute("vertPos");
+   shader->addAttribute("vertNor");
+   shader->addAttribute("vertTex");
+   setMaterial(shader, 0);
 }
 void Player::updateMaterial(){}
 void Player::render(shared_ptr<MatrixStack> Projection,mat4 View,shared_ptr<MatrixStack> Model){
+   Model->pushMatrix();
+      shader->bind(); 
+      updateLights(shader);
+      Model->translate(position);
+      glUniformMatrix4fv(shader->getUniform("P"), 1, GL_FALSE, value_ptr(Projection->topMatrix()));
+      glUniformMatrix4fv(shader->getUniform("V"), 1, GL_FALSE, value_ptr(View));
+      glUniformMatrix4fv(shader->getUniform("M"), 1, GL_FALSE, value_ptr(View));
+      mesh[0]->draw(shader);
+      shader->unbind(); 
+   Model->popMatrix();
+}
+void Player::update(double dt){
+   float fdt = (float) dt;
+   position = position + (velocity * fdt + .5f * acceleration * fdt * fdt);
 }
 
 

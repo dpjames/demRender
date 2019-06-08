@@ -38,7 +38,7 @@ public:
 	// Shape to be used (from  file) - modify to support multiple
 
    shared_ptr<Topo> ground;
-   
+   shared_ptr<Player> player; 
    vector<shared_ptr<Renderable>> renderables;
    vector<shared_ptr<Updateable>> updateables;
 
@@ -178,6 +178,10 @@ public:
       sky->init();
       renderables.push_back((shared_ptr<Renderable>)sky);
       
+      player = make_shared<Player>();
+      player->init(State::viewPosition);
+      renderables.push_back((shared_ptr<Renderable>)player);
+      
    }
    /*
     *
@@ -186,6 +190,8 @@ public:
    //updates the above variables according to how much time has passed since the last update.
    void moveView(double dt){
       dt*=1000;
+
+      player->update(dt);
       vec3 viewPosMod = vec3(0,0,0);
       if(moveDir[0] != 0){
          viewPosMod[0] = -1*dt*moveDir[0];
