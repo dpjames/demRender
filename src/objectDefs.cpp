@@ -109,6 +109,8 @@ void GroundMap::generateMap(unsigned char *lcdata,
       int demwidth, 
       int demheight){
    cout << "generating ground map" << endl;
+   //int DY = 1;
+   //int DX = 1;
    int DY = 100;
    int DX = 100;
    float density = 8;
@@ -289,8 +291,6 @@ void Topo::createShader(){
    shader->addUniform("MatDif");
    shader->addUniform("lightCol");
    shader->addUniform("MatAmb");
-   shader->addUniform("MatSpec");
-   shader->addUniform("shine");
    shader->addUniform("lightPos");
    shader->addAttribute("vertPos");
    shader->addAttribute("vertNor");
@@ -517,44 +517,48 @@ void Cover::render(shared_ptr<MatrixStack> Model,
 /* Begin Player Class */
 /**********************/
 void Player::init(vec3 pos){
-   velocity = vec3(0,0,1);
+   velocity = vec3(0,0,.001);
    acceleration = vec3(0,0,0);
    position = pos;
 
    //model
-   readObj(State::resourceDirectory + "/skybox/cube.obj", mesh); //TODO cahnge  this
+   readObj(State::resourceDirectory + "/player/mesh.obj", mesh); //TODO cahnge  this
+   readObj(State::resourceDirectory + "/player/ringMesh.obj", ringMesh); //TODO cahnge  this
 
    //shader
    shader = make_shared<Program>();
    shader->setVerbose(true);
-   shader->setShaderNames(State::resourceDirectory + "/plane_vert.glsl", State::resourceDirectory + "/plane_frag.glsl");
+   shader->setShaderNames(State::resourceDirectory + "/player_vert.glsl", State::resourceDirectory + "/player_frag.glsl");
    shader->init();
    shader->addUniform("P");
    shader->addUniform("V");
    shader->addUniform("M");
-   shader->addUniform("MatDif");
-   shader->addUniform("lightCol");
-   shader->addUniform("MatAmb");
-   shader->addUniform("MatSpec");
-   shader->addUniform("shine");
-   shader->addUniform("lightPos");
    shader->addAttribute("vertPos");
    shader->addAttribute("vertNor");
    shader->addAttribute("vertTex");
-   setMaterial(shader, 0);
+}
+void Player::setRadius(float r){
+   radius = r;
 }
 void Player::updateMaterial(){}
 void Player::render(shared_ptr<MatrixStack> Projection,mat4 View,shared_ptr<MatrixStack> Model){
+   shader->bind(); 
+   glUniformMatrix4fv(shader->getUniform("P"), 1, GL_FALSE, value_ptr(Projection->topMatrix()));
+   glUniformMatrix4fv(shader->getUniform("V"), 1, GL_FALSE, value_ptr(View));
    Model->pushMatrix();
-      shader->bind(); 
-      updateLights(shader);
-      Model->translate(position);
-      glUniformMatrix4fv(shader->getUniform("P"), 1, GL_FALSE, value_ptr(Projection->topMatrix()));
-      glUniformMatrix4fv(shader->getUniform("V"), 1, GL_FALSE, value_ptr(View));
-      glUniformMatrix4fv(shader->getUniform("M"), 1, GL_FALSE, value_ptr(View));
+      Model->translate(State::viewPosition / State::scaler);
+      Model->pushMatrix();
+         Model->translate(vec3(0,900,0));
+         Model->scale(vec3(radius * 100) / State::scaler);
+         glUniformMatrix4fv(shader->getUniform("M"), 1, GL_FALSE, value_ptr(Model->topMatrix()));
+         ringMesh[0]->draw(shader);
+      Model->popMatrix();
+
+      Model->scale(vec3(10) / State::scaler);
+      glUniformMatrix4fv(shader->getUniform("M"), 1, GL_FALSE, value_ptr(Model->topMatrix()));
       mesh[0]->draw(shader);
-      shader->unbind(); 
    Model->popMatrix();
+   shader->unbind(); 
 }
 void Player::update(double dt){
    float fdt = (float) dt;
@@ -590,12 +594,12 @@ float State::theta       = State::initTheta;
 float State::scaler = 1;
 
 //defaults
-GLfloat State::zscale = 1;
+GLfloat State::zscale = .001;
 int State::ztrans = 0;
 int State::topoDetailLevel = 10;
 string State::resourceDirectory = "../resources";
-string State::placeDirectory = "/.";
-bool State::grounded = false;
+string State::placeDirectory = "/YOSEMITE_HD";
+bool State::grounded = true;
 bool State::capturedCursor = true;
 void State::reset(){
    State::lightPos     = State::initLightPos;
@@ -663,6 +667,7 @@ void Skybox::createShader(){
    shader->addAttribute("vertTex");
 }
 void Skybox::render(shared_ptr<MatrixStack> Projection,mat4 View,shared_ptr<MatrixStack> Model){
+   glDisable(GL_CULL_FACE);
    Model->pushMatrix();
       shader->bind();
       Model->scale(vec3(10000*State::scaler,10000*State::scaler,10000*State::scaler)); 
@@ -675,10 +680,29 @@ void Skybox::render(shared_ptr<MatrixStack> Projection,mat4 View,shared_ptr<Matr
       shader->unbind();
       glDepthFunc(GL_LESS);
    Model->popMatrix();
+   glEnable(GL_CULL_FACE);
 }
 void Skybox::updateMaterial(){
 
 }
 /**********************/
 /*  END SKYBO  CLASS  */
+/**********************/
+
+
+/**********************/
+/*  END COLLEC CLASS  */
+/**********************/
+
+void Collectables::init(int width, int height, int number){
+   readObj(
+}
+void Collectables::render(shared_ptr<MatrixStack> Projection,mat4 View,shared_ptr<MatrixStack> Model){
+
+}
+void Collectables::updateMaterial(){
+
+}
+/**********************/
+/* BEGIN COLLEC CLASS */
 /**********************/

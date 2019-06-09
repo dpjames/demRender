@@ -216,12 +216,25 @@ class Player : public Renderable, Updateable {
       vec3 position;
 	   shared_ptr<Program> shader;
       vector<shared_ptr<Shape>> mesh;
+      vector<shared_ptr<Shape>> ringMesh;
+      float radius;
    public :
+      void setRadius(float r);
       void init(vec3 pos);
       void render(shared_ptr<MatrixStack> Projection,mat4 View,shared_ptr<MatrixStack> Model);
       void updateMaterial();
       void update(double dt);
 };
+
+class Collectables : Renderable {
+   private :
+      vector<shared_ptr<Shape>> mesh;
+      vector<vec3> positions;
+   public : 
+      void init(int width, int height, int number);
+      void render(shared_ptr<MatrixStack> Projection,mat4 View,shared_ptr<MatrixStack> Model);
+      void updateMaterial();
+}
 
 #endif
 
