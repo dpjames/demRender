@@ -39,6 +39,7 @@ public:
 
    shared_ptr<Topo> ground;
    shared_ptr<Player> player; 
+   shared_ptr<Collectables> coins;
    vector<shared_ptr<Renderable>> renderables;
    vector<shared_ptr<Updateable>> updateables;
 
@@ -182,7 +183,11 @@ public:
       
       player = make_shared<Player>();
       player->init(State::viewPosition);
-      //renderables.push_back((shared_ptr<Renderable>)player);
+
+      coins = make_shared<Collectables>();
+      coins->init(100, ground);
+      renderables.push_back((shared_ptr<Renderable>) coins);
+      updateables.push_back((shared_ptr<Updateable>) coins);
       
    }
    /*
@@ -234,8 +239,13 @@ public:
       //phicounter+=M_PI/10000 * dt;
       //thetacounter+=M_PI/400000 * dt;
       radiusCounter += M_PI/1000 * dt;
+
       if(State::grounded){
          moveToGround();
+      }
+
+      for(int i = 0; i < updateables.size(); i++){
+         updateables[i]->update(dt);
       }
    }
    void moveToGround(){
@@ -245,9 +255,9 @@ public:
       if(index >= ground->width * ground->height 
             || index < 0 
             || State::viewPosition[0] < 0 
-            || State::viewPosition[0] >= ground->width
+            || State::viewPosition[0] >= ground->width * State::scaler
             || State::viewPosition[1] < 0
-            || State::viewPosition[1] >= ground->height){
+            || State::viewPosition[1] >= ground->height * State::scaler){
          return;
       } 
       State::viewPosition[1] = (ground->elevationData[index] + State::ztrans) * State::zscale * State::scaler + 3; //the 1 is the player height. right now 1 unit. TODO
@@ -304,12 +314,13 @@ public:
       mat4 View = glm::lookAt(top, State::viewPosition,  vec3(0,0,1));
       Projection->ortho(ground->width/-2,ground->width/2,ground->height/-2,ground->height/2, .01, 10000 * State::scaler);
       Model->pushMatrix();
-         Model->translate(State::viewPosition);
+         Model->translate(State::viewPosition / State::scaler);
          Model->rotate(angle,vec3(0,1,0) );
-         Model->translate(State::viewPosition * -1.0f);
+         Model->translate(State::viewPosition * -1.0f / State::scaler);
          ground->render(Projection, View, Model);
          player->setRadius(.2 + .1 * (1 + cos(radiusCounter)));
          player->render(Projection, View, Model);
+         coins->render(Projection,View,Model);
       Model->popMatrix();
       glEnable(GL_CULL_FACE);
       glEnable(GL_DEPTH_TEST);

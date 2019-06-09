@@ -111,9 +111,9 @@ void GroundMap::generateMap(unsigned char *lcdata,
    cout << "generating ground map" << endl;
    //int DY = 1;
    //int DX = 1;
-   int DY = 100;
-   int DX = 100;
-   float density = 8;
+   int DY = 1;
+   int DX = 1;
+   float density = 10;
    //unsigned char seen[width * height] = {};
    for(int y = 0; y < lcheight; y+=DY){
       for(int x = 0; x < lcwidth; x+=DX){
@@ -129,17 +129,37 @@ void GroundMap::generateMap(unsigned char *lcdata,
       }
    }
 }
+double timeoutside = 0;
+double exitTime = 0;
+double enterTime = 0;
+double incount = 0;
+double inenter = 0;
+
 void GroundMap::render(shared_ptr<MatrixStack> Projection,
       mat4 View,
       shared_ptr<MatrixStack> Model){
+   timeoutside = 0;
+   exitTime = 0;
+   enterTime = 0;
+   incount = 0;
+   inenter = 0;
+   enterTime = glfwGetTime();
+
    Model->pushMatrix();
    for(unsigned int i = 0; i < blocks.size(); i++){
       vec3 dvec = blocks[i]->getPosition() * State::scaler - State::viewPosition;
       float dist = sqrt(pow(dvec[0],2) + pow(dvec[2],2));
       if(dist < 50 * State::scaler){
+         inenter = glfwGetTime();
          blocks[i]->render(Projection, View, Model);
+         incount+=glfwGetTime() - inenter;
       }
    }
+
+   exitTime = glfwGetTime();
+   cout << "time total: " << exitTime - enterTime << "|||";
+   cout << "inTime: " << incount << "|||";
+   cout << "out time: " << incount - (exitTime - enterTime) << endl;
    Model->popMatrix();
 }
 void GroundMap::updateMaterial(){
@@ -314,6 +334,9 @@ void Topo::render(shared_ptr<MatrixStack> Projection,
    shader->unbind(); 
 
    Model->popMatrix();
+}
+float Topo::getElevation(int x, int y){
+   return (elevationData[x + y * width] + State::ztrans) * State::zscale;
 }
 /**********************/
 /*   END TOPO CLASS   */
@@ -694,11 +717,70 @@ void Skybox::updateMaterial(){
 /*  END COLLEC CLASS  */
 /**********************/
 
-void Collectables::init(int width, int height, int number){
-   readObj(
+void Collectables::init(int number, shared_ptr<Topo> ground){
+   readObj(State::resourceDirectory + "/coins/mesh.obj", mesh);
+   for(int i = 0; i < number; i++){
+      int x = rand() % ground->width;
+      int z = rand() % ground->height;
+      int y = ground->getElevation(x,z) + 5;
+      positions.push_back(vec4(x,y,z,rand()%(int)(M_PI * 200) / 200.0f));
+      baseHeights.push_back(y);
+   }
+   shader = make_shared<Program>();
+   shader->setVerbose(true);
+   shader->setShaderNames(State::resourceDirectory + "/coins/vert.glsl", State::resourceDirectory + "/coins/frag.glsl");
+   shader->init();
+   shader->addUniform("P");
+   shader->addUniform("V");
+   shader->addUniform("M");
+   shader->addUniform("MatDif");
+   shader->addUniform("lightCol");
+   shader->addUniform("MatAmb");
+   shader->addUniform("MatSpec");
+   shader->addUniform("shine");
+   shader->addUniform("lightPos");
+   shader->addUniform("Texture0");
+   shader->addAttribute("vertPos");
+   shader->addAttribute("vertNor");
+   shader->addAttribute("vertTex");
+   setMaterial(shader, 2);
+   texture.setFilename(State::resourceDirectory + "/coins/texture.jpg");
+   texture.init();
+   texture.setWrapModes(GL_REPEAT,GL_REPEAT);
 }
+//void Collectables::renderMinimap(shared_ptr<MatrixStack> Projection,mat4 View,shared_ptr<MatrixStack> Model){
+//
+//}
 void Collectables::render(shared_ptr<MatrixStack> Projection,mat4 View,shared_ptr<MatrixStack> Model){
-
+   shader->bind();
+   texture.bind(shader->getUniform("Texture0"));
+   updateLights(shader);
+   Model->pushMatrix();
+   glUniformMatrix4fv(shader->getUniform("P"), 1, GL_FALSE, value_ptr(Projection->topMatrix()));
+   glUniformMatrix4fv(shader->getUniform("V"), 1, GL_FALSE, value_ptr(View));
+   for(int i = 0; i < positions.size(); i++){
+      Model->pushMatrix();
+         Model->translate(vec3(positions[i]));
+         Model->scale(vec3(.1,.1,.1));
+         Model->rotate(rotationCounter + positions[i][3], vec3(0,1,0));
+         Model->rotate(M_PI/2,vec3(0,0,1));
+         glUniformMatrix4fv(shader->getUniform("M"), 1, GL_FALSE, value_ptr(Model->topMatrix()));
+         mesh[0]->draw(shader);
+      Model->popMatrix();
+   }
+   Model->popMatrix();
+   texture.unbind();
+   shader->unbind();
+}
+void Collectables::update(double dt){
+   rotationCounter+=M_PI/3000 * dt;
+   for(int i = 0; i < positions.size(); i++){
+      positions[i][1] = baseHeights[i] + cos(rotationCounter + positions[i][3]) * 4;
+      if(length(State::viewPosition / State::scaler - vec3(positions[i])) < 2){
+         positions.erase(positions.begin()+i); 
+         baseHeights.erase(baseHeights.begin()+i); 
+      }
+   }
 }
 void Collectables::updateMaterial(){
 
