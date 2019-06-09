@@ -28,6 +28,7 @@ using std::ifstream;
 using std::to_string;
 using std::fstream;
 using glm::vec3;
+using glm::vec4;
 using glm::mat4;
 
 class Renderable {
@@ -65,6 +66,7 @@ class Topo: public Renderable {
                   mat4 View,
                   shared_ptr<MatrixStack> Model);
       void updateMaterial();
+      float getElevation(int x, int y);
 };
 
 class Cover {
@@ -209,7 +211,7 @@ class Skybox : public Renderable{
       void updateMaterial();
 };
 
-class Player : public Renderable, Updateable {
+class Player : public Renderable, public Updateable {
    private : 
       vec3 velocity;
       vec3 acceleration;
@@ -226,15 +228,20 @@ class Player : public Renderable, Updateable {
       void update(double dt);
 };
 
-class Collectables : Renderable {
+class Collectables : public Renderable, public Updateable {
    private :
+      float rotationCounter;
+      Texture texture; 
       vector<shared_ptr<Shape>> mesh;
-      vector<vec3> positions;
+      vector<vec4> positions;
+      vector<float> baseHeights;
+      shared_ptr<Program> shader;
    public : 
-      void init(int width, int height, int number);
+      void init(int number, shared_ptr<Topo> ground);
       void render(shared_ptr<MatrixStack> Projection,mat4 View,shared_ptr<MatrixStack> Model);
       void updateMaterial();
-}
+      void update(double dt);
+};
 
 #endif
 
