@@ -112,8 +112,6 @@ public:
     */
 	void mouseCallback(GLFWwindow *window, int button, int action, int mods)
 	{
-		double posX, posY;
-
 		if (action == GLFW_PRESS)
 		{
          State::capturedCursor = !State::capturedCursor;
@@ -154,11 +152,15 @@ public:
 		GLSL::checkVersion();
 
 		// Set background color.
-		glClearColor(.12f, .34f, .56f, 1.0f);
+		glClearColor(0,0,0,0);
 		// Enable z-buffer test.
 		glEnable(GL_DEPTH_TEST);
-      
+      glEnable(GL_CULL_FACE); 
+      glCullFace(GL_BACK);
       LandType::init(); 
+
+
+
 	}
    GLfloat LY = 10;
 	void initSceneObjects(){
@@ -180,7 +182,7 @@ public:
       
       player = make_shared<Player>();
       player->init(State::viewPosition);
-      renderables.push_back((shared_ptr<Renderable>)player);
+      //renderables.push_back((shared_ptr<Renderable>)player);
       
    }
    /*
@@ -231,24 +233,30 @@ public:
       //thetacounter+=M_PI/dt/10;
       //phicounter+=M_PI/10000 * dt;
       //thetacounter+=M_PI/400000 * dt;
+      radiusCounter += M_PI/1000 * dt;
       if(State::grounded){
          moveToGround();
       }
    }
    void moveToGround(){
-      unsigned int index = 
+      int index = 
          ((int)(State::viewPosition[0] / State::scaler)) + 
          ((int)(State::viewPosition[2] / State::scaler) * ground->width);
-      if(index >= ground->width * ground->height || index < 0){
+      if(index >= ground->width * ground->height 
+            || index < 0 
+            || State::viewPosition[0] < 0 
+            || State::viewPosition[0] >= ground->width
+            || State::viewPosition[1] < 0
+            || State::viewPosition[1] >= ground->height){
          return;
       } 
       State::viewPosition[1] = (ground->elevationData[index] + State::ztrans) * State::zscale * State::scaler + 3; //the 1 is the player height. right now 1 unit. TODO
-      //(State::viewPosition[1] / State::scaler) < 
 
    }
    float worldRad = 1000;
    float thetacounter = 0;
    float phicounter = 0;
+   float radiusCounter = 1;
 	void render()
 	{
       //setup view and things
@@ -268,14 +276,44 @@ public:
          radius * cos(State::phi) * cos((M_PI/2) - State::theta)
       ));
       mat4 View = glm::lookAt(State::viewPosition, State::viewPosition + viewDir, vec3(0,1,0));
+
       Model->pushMatrix();
          Model->loadIdentity();
          Model->scale(vec3(State::scaler, State::scaler, State::scaler));
          for(unsigned int i = 0; i < renderables.size(); i++){
             renderables[i]->render(Projection,View,Model);
          }
+         drawMinimap(width, height, Model, Projection, State::theta + M_PI / -2);
       Model->popMatrix();
 	}
+   void drawMinimap(int width, 
+         int height, 
+         shared_ptr<MatrixStack> Model,
+         shared_ptr<MatrixStack> Projection,
+         float angle){
+		glDisable(GL_DEPTH_TEST);
+      glDisable(GL_CULL_FACE);
+      glViewport(0,0, width/6 + width/1000 * 2, height/6 + height/1000 * 2);
+      glEnable(GL_SCISSOR_TEST);
+      glScissor(0,0, width/6 + width/1000 * 2, height/6 + height/1000 * 2);
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+      glDisable(GL_SCISSOR_TEST);
+      glViewport(width/1000,width/1000, width/6, height/6);
+      vec3 top = State::viewPosition;
+      top[1] = 1000 * State::scaler;
+      mat4 View = glm::lookAt(top, State::viewPosition,  vec3(0,0,1));
+      Projection->ortho(ground->width/-2,ground->width/2,ground->height/-2,ground->height/2, .01, 10000 * State::scaler);
+      Model->pushMatrix();
+         Model->translate(State::viewPosition);
+         Model->rotate(angle,vec3(0,1,0) );
+         Model->translate(State::viewPosition * -1.0f);
+         ground->render(Projection, View, Model);
+         player->setRadius(.2 + .1 * (1 + cos(radiusCounter)));
+         player->render(Projection, View, Model);
+      Model->popMatrix();
+      glEnable(GL_CULL_FACE);
+      glEnable(GL_DEPTH_TEST);
+   }
 };
 void setOpt(char opt, char *value){
    switch(opt){
