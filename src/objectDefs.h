@@ -52,10 +52,7 @@ class TypeBuffer {
       vector<GLfloat> verticies;
       vector<GLfloat> normals;
       vector<GLfloat> textures;
-      vector<GLfloat> m1;
-      vector<GLfloat> m2;
-      vector<GLfloat> m3;
-      vector<GLfloat> m4;
+      vector<GLfloat> m;
       void init(int t);
       void addMat(mat4 M);
       void fill();
