@@ -151,20 +151,18 @@ public:
 	void init()
 	{
 		GLSL::checkVersion();
-
 		// Set background color.
 		glClearColor(0,0,0,0);
 		// Enable z-buffer test.
 		glEnable(GL_DEPTH_TEST);
       glEnable(GL_CULL_FACE); 
       glCullFace(GL_BACK);
-      LandType::init(); 
-
-
-
 	}
    GLfloat LY = 10;
 	void initSceneObjects(){
+
+      LandType::init(); 
+
       ground = make_shared<Topo>();
       ground->init(State::resourceDirectory + State::placeDirectory + "/topo.bin"); 
       State::initViewPosition = vec3(ground->width/2, 0, ground->height/2);
