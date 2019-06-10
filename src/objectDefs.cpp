@@ -100,7 +100,15 @@ void GroundMap::init(string lcfile, uint32_t *demdata, int demwidth, int demheig
    int lcwidth, lcheight, lcn;
    unsigned char *lcdata;
    readJPG(lcfile, lcdata, &lcwidth, &lcheight, &lcn);
+   for(int i = 0; i < N_LAND_TYPES; i++){
+      buffers.push_back(NULL);
+   }
    generateMap(lcdata, demdata, lcwidth, lcheight, demwidth, demheight); 
+}
+void GroundMap::clearBuffers(){
+   for(int i = 0; i < N_LAND_TYPES; i++){
+      buffers[i] = NULL;
+   }
 }
 void GroundMap::generateMap(unsigned char *lcdata, 
       uint32_t *demdata, 
@@ -111,9 +119,9 @@ void GroundMap::generateMap(unsigned char *lcdata,
    cout << "generating ground map" << endl;
    //int DY = 1;
    //int DX = 1;
-   int DY = 1;
-   int DX = 1;
-   float density = 10;
+   int DY = 10;
+   int DX = 10;
+   float density = 3;
    //unsigned char seen[width * height] = {};
    for(int y = 0; y < lcheight; y+=DY){
       for(int x = 0; x < lcwidth; x+=DX){
@@ -126,8 +134,54 @@ void GroundMap::generateMap(unsigned char *lcdata,
          shared_ptr<LandCover> block = make_shared<LandCover>();
          block->init(type, elev, density, demdata, demwidth, demheight, wx, wy, DX/(float)lcwidth * demwidth, DY/(float)lcheight * demheight);
          blocks.push_back(block);
+         if(buffers[type] == NULL){
+            buffers[type] = make_shared<TypeBuffer>();
+            buffers[type]->init(type);
+         }
+         buffers[type]->nElements++;
       }
    }
+   cout << "init loop for buf size "  << buffers.size() << endl;
+   for(int i = 0; i < buffers.size(); i++){
+      if(buffers[i] != NULL){
+         buffers[i]->fill();
+         initBufferArrays(i);
+      }
+   }
+}
+void GroundMap::initBufferArrays(int type){
+   cout << "init buf arrays " << type << endl;
+   shared_ptr<TypeBuffer> buf = buffers[type];
+   //setup the vertices
+   GLuint vertexBufferID;
+   GLuint vertexArrayID;
+   glGenVertexArrays(1, &vertexArrayID);
+   glBindVertexArray(vertexArrayID);
+   buf->vaoID = vertexArrayID;
+   
+   glGenBuffers(1, &vertexBufferID);
+   glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
+   glBufferData(GL_ARRAY_BUFFER, sizeof(GL_FLOAT) * buf->verticies.size(), buf->verticies.data(), GL_DYNAMIC_DRAW);
+   glEnableVertexAttribArray(0);
+   glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE, 0,(void *) 0);
+   
+   //setup the normals
+   GLuint normalBufferID;
+   glGenBuffers(1, &normalBufferID);
+   glBindBuffer(GL_ARRAY_BUFFER, normalBufferID);
+   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * buf->normals.size(), buf->normals.data(), GL_DYNAMIC_DRAW);
+   glEnableVertexAttribArray(1);
+   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
+   
+   //setup the textur coord
+   GLuint textureBufferID;
+   glGenBuffers(1, &textureBufferID);
+   glBindBuffer(GL_ARRAY_BUFFER, textureBufferID);
+   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * buf->textures.size(), buf->textures.data(), GL_DYNAMIC_DRAW);
+   glEnableVertexAttribArray(2);
+   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*) 0);
+   glBindVertexArray(0);
+
 }
 double timeoutside = 0;
 double exitTime = 0;
@@ -138,37 +192,123 @@ double inenter = 0;
 void GroundMap::render(shared_ptr<MatrixStack> Projection,
       mat4 View,
       shared_ptr<MatrixStack> Model){
-   timeoutside = 0;
-   exitTime = 0;
-   enterTime = 0;
-   incount = 0;
-   inenter = 0;
-   enterTime = glfwGetTime();
-
+   //time code below
+   timeoutside = 0;exitTime = 0;enterTime = 0;incount = 0;inenter = 0;enterTime = glfwGetTime();
    Model->pushMatrix();
    for(unsigned int i = 0; i < blocks.size(); i++){
       vec3 dvec = blocks[i]->getPosition() * State::scaler - State::viewPosition;
       float dist = sqrt(pow(dvec[0],2) + pow(dvec[2],2));
-      if(dist < 50 * State::scaler){
+      if(true || dist < 50 * State::scaler){
          inenter = glfwGetTime();
-         blocks[i]->render(Projection, View, Model);
+         blocks[i]->render(Projection, View, Model, buffers[blocks[i]->type]);
+         //time code below 
          incount+=glfwGetTime() - inenter;
       }
    }
-
-   exitTime = glfwGetTime();
-   cout << "time total: " << exitTime - enterTime << "|||";
-   cout << "inTime: " << incount << "|||";
-   cout << "out time: " << incount - (exitTime - enterTime) << endl;
+   //time code below
+   exitTime = glfwGetTime();cout << "time total: " << exitTime - enterTime << "|||";cout << "inTime: " << incount << "|||";cout << "out time: " << incount - (exitTime - enterTime) << endl;
    Model->popMatrix();
+   renderAll((Projection->topMatrix()), View);
 }
 void GroundMap::updateMaterial(){
 
+}
+void GroundMap::renderAll(mat4 P, mat4 V){
+   for(int i = 0; i < N_LAND_TYPES; i++){
+      renderType(i, P, V);
+   }
+}
+void GroundMap::renderType(int type, mat4 P, mat4 V){
+   shared_ptr<TypeBuffer> buf = buffers[type];
+   if(buf == NULL || buf->verticies.size() == 0){
+      return;
+   }
+   cout << "rendering " << type << endl;
+   
+
+   glBindVertexArray(buf->vaoID);
+
+   //setup the M mats
+   GLuint mBufferID[4];
+   glGenBuffers(4, mBufferID);
+   glBindBuffer(GL_ARRAY_BUFFER, mBufferID[0]);
+   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * buf->m1.size(), buf->m1.data(), GL_DYNAMIC_DRAW);
+   glEnableVertexAttribArray(3);
+   glVertexAttribPointer(3,4,GL_FLOAT,GL_FALSE,0,(void *) 0);
+   glVertexAttribDivisor(3, buf->verticies.size() / buf->nElements); 
+   glBindBuffer(GL_ARRAY_BUFFER, mBufferID[1]);
+   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * buf->m2.size(), buf->m2.data(), GL_DYNAMIC_DRAW);
+   glEnableVertexAttribArray(4);
+   glVertexAttribPointer(4,4,GL_FLOAT,GL_FALSE,0,(void *) 0);
+   glVertexAttribDivisor(4, buf->verticies.size() / buf->nElements); 
+
+   glBindBuffer(GL_ARRAY_BUFFER, mBufferID[2]);
+   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * buf->m3.size(), buf->m3.data(), GL_DYNAMIC_DRAW);
+   glEnableVertexAttribArray(5);
+   glVertexAttribPointer(5,4,GL_FLOAT,GL_FALSE,0,(void *) 0);
+   glVertexAttribDivisor(5, buf->verticies.size() / buf->nElements); 
+
+   glBindBuffer(GL_ARRAY_BUFFER, mBufferID[3]);
+   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * buf->m4.size(), buf->m4.data(), GL_DYNAMIC_DRAW);
+   glEnableVertexAttribArray(6);
+   glVertexAttribPointer(6,4,GL_FLOAT,GL_FALSE,0,(void *) 0);
+   glVertexAttribDivisor(6, buf->verticies.size() / buf->nElements); 
+
+   //bind the null
+   glBindVertexArray(0);
+
+   //the render
+   buf->shader->bind();
+   updateLights(buf->shader);
+   glUniformMatrix4fv(buf->shader->getUniform("P"), 1, GL_FALSE, value_ptr(P));
+   glUniformMatrix4fv(buf->shader->getUniform("V"), 1, GL_FALSE, value_ptr(V));
+   glBindVertexArray(buf->vaoID);
+   buf->texture.bind(buf->shader->getUniform("Texture0"));
+   glDrawArrays(GL_TRIANGLES, 0, buf->verticies.size());
+   glBindVertexArray(0);
+   buf->texture.unbind();
+   buf->shader->unbind();
 }
 /**********************/
 /*  END GROUND CLASS  */
 /**********************/
 
+/**********************/
+/* BEGIN TBUFF CLASS  */
+/**********************/
+void TypeBuffer::init(int t){
+   type = t;
+   vector<shared_ptr<Shape>> mesh;
+   LandType::getDrawDataForType(type, this->texture, this->mesh);
+   this->shader = LandType::shader;
+   nElements = 0;
+}
+void TypeBuffer::fill(){
+   for(int k = 0; k < nElements; k++){
+      for(int j = 0; j < mesh.size(); j++){
+         for(int i = 0; i < mesh[j]->posBuf.size(); i++){
+            verticies.push_back(mesh[j]->posBuf[i]);
+         }
+         for(int i = 0; i < mesh[j]->norBuf.size(); i++){
+            normals.push_back(mesh[j]->posBuf[i]);
+         }
+         for(int i = 0; i < mesh[j]->texBuf.size(); i++){
+            textures.push_back(mesh[j]->posBuf[i]);
+         }
+      }
+   }
+}
+void TypeBuffer::addMat(mat4 M){
+   for(int i = 0; i < 4; i++){
+      m1.push_back(M[0][i]);
+      m2.push_back(M[0][i]);
+      m3.push_back(M[0][i]);
+      m4.push_back(M[0][i]);
+   }
+}
+/**********************/
+/*  END TBUFF  CLASS  */
+/**********************/
 
 /**********************/
 /*  BEGIN TOPO CLASS  */
@@ -328,7 +468,7 @@ void Topo::render(shared_ptr<MatrixStack> Projection,
    glUniformMatrix4fv(shader->getUniform("M"), 1, GL_FALSE, value_ptr(Model->topMatrix()));
    glBindVertexArray(topoVertexArrayID);
    texture.bind(shader->getUniform("Texture0"));
-   glDrawArrays(GL_TRIANGLES, 0, topoVertex.size() * 3);
+   glDrawArrays(GL_TRIANGLES, 0, topoVertex.size());
    glBindVertexArray(0);
    texture.unbind();
    shader->unbind(); 
@@ -432,6 +572,10 @@ void LandType::init(){
    shader->addAttribute("vertPos");
    shader->addAttribute("vertNor");
    shader->addAttribute("vertTex");
+   shader->addAttribute("m1");
+   shader->addAttribute("m2");
+   shader->addAttribute("m3");
+   shader->addAttribute("m4");
    setMaterial(shader, TOPO_MATERIAL);
 }
 
@@ -454,6 +598,7 @@ void LandCover::init(int landType, uint32_t elev, float indensity, uint32_t *dem
    globalScale = vec3(1,1,1); // this will prob be removed
    globalRotat = vec3(0,0,0); // this will prob be removed
    fillItems(dem, demwidth, demheight, originx, originy);
+   type = landType;
 }
 vec3 LandCover::getPosition(){
    return (minTrans + maxTrans) / 2.0f;
@@ -489,19 +634,20 @@ void LandCover::fillItems(uint32_t *elev, unsigned int width, unsigned int heigh
 }
 void LandCover::render(shared_ptr<MatrixStack> Projection,
       mat4 View,
-      shared_ptr<MatrixStack> Model){
-   shader->bind();
-   updateLights(shader);
-   glUniformMatrix4fv(shader->getUniform("P"), 1, GL_FALSE, value_ptr(Projection->topMatrix()));
-   glUniformMatrix4fv(shader->getUniform("V"), 1, GL_FALSE, value_ptr(View));
+      shared_ptr<MatrixStack> Model,
+      shared_ptr<TypeBuffer> buffer){
+   //shader->bind();
+   //updateLights(shader);
+   //glUniformMatrix4fv(shader->getUniform("P"), 1, GL_FALSE, value_ptr(Projection->topMatrix()));
+   //glUniformMatrix4fv(shader->getUniform("V"), 1, GL_FALSE, value_ptr(View));
    Model->pushMatrix();
-   texture.bind(shader->getUniform("Texture0"));
+   //texture.bind(shader->getUniform("Texture0"));
    for(unsigned int i = 0; i < items.size(); i++){
-      items[i]->render(Model, shader, mesh);
+      items[i]->render(Model, shader, buffer);
    }
-   texture.unbind();
+   //texture.unbind();
    Model->popMatrix();
-   shader->unbind();
+   //shader->unbind();
 
 }
 /**********************/
@@ -518,17 +664,18 @@ void Cover::init(vec3 t, vec3 s, vec3 r){
 }
 void Cover::render(shared_ptr<MatrixStack> Model,
       shared_ptr<Program> shader,
-      vector<shared_ptr<Shape>> mesh){
+      shared_ptr<TypeBuffer> buffer){
    Model->pushMatrix();
    Model->translate(trans);
    Model->scale(scale);
    Model->rotate(rotat[0], vec3(1,0,0));
    Model->rotate(rotat[1], vec3(0,1,0));
    Model->rotate(rotat[2], vec3(0,0,1));
-   glUniformMatrix4fv(shader->getUniform("M"), 1, GL_FALSE, value_ptr(Model->topMatrix()));
-   for(unsigned int i = 0; i < mesh.size(); i++){
-      mesh[i]->draw(shader);
-   }
+   buffer->addMat(Model->topMatrix());
+   //glUniformMatrix4fv(shader->getUniform("M"), 1, GL_FALSE, value_ptr(Model->topMatrix()));
+   //for(unsigned int i = 0; i < mesh.size(); i++){
+   //   mesh[i]->draw(shader);
+   //}
    Model->popMatrix();
 
 }
