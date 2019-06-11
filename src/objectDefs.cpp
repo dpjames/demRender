@@ -119,8 +119,8 @@ void GroundMap::generateMap(unsigned char *lcdata,
    cout << "generating ground map" << endl;
    //int DY = 1;
    //int DX = 1;
-   int DY = 10;
-   int DX = 10;
+   int DY = 1;
+   int DX = 1;
    float density = 3;
    //unsigned char seen[width * height] = {};
    for(int y = 0; y < lcheight; y+=DY){
@@ -138,7 +138,6 @@ void GroundMap::generateMap(unsigned char *lcdata,
             buffers[type] = make_shared<TypeBuffer>();
             buffers[type]->init(type);
          }
-         buffers[type]->nElements+=density;
       }
    }
    for(int i = 0; i < buffers.size(); i++){
@@ -159,7 +158,7 @@ void GroundMap::initBufferArrays(int type){
    
    glGenBuffers(1, &vertexBufferID);
    glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
-   glBufferData(GL_ARRAY_BUFFER, sizeof(GL_FLOAT) * buf->verticies.size(), buf->verticies.data(), GL_DYNAMIC_DRAW);
+   glBufferData(GL_ARRAY_BUFFER, sizeof(GL_FLOAT) * buf->verticies.size(), buf->verticies.data(), GL_STREAM_DRAW);
    glEnableVertexAttribArray(0);
    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE, 0,(void *) 0);
    
@@ -167,7 +166,7 @@ void GroundMap::initBufferArrays(int type){
    GLuint normalBufferID;
    glGenBuffers(1, &normalBufferID);
    glBindBuffer(GL_ARRAY_BUFFER, normalBufferID);
-   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * buf->normals.size(), buf->normals.data(), GL_DYNAMIC_DRAW);
+   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * buf->normals.size(), buf->normals.data(), GL_STREAM_DRAW);
    glEnableVertexAttribArray(1);
    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
    
@@ -175,9 +174,17 @@ void GroundMap::initBufferArrays(int type){
    GLuint textureBufferID;
    glGenBuffers(1, &textureBufferID);
    glBindBuffer(GL_ARRAY_BUFFER, textureBufferID);
-   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * buf->textures.size(), buf->textures.data(), GL_DYNAMIC_DRAW);
+   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * buf->textures.size(), buf->textures.data(), GL_STREAM_DRAW);
    glEnableVertexAttribArray(2);
    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*) 0);
+
+   GLuint eleBufID; 
+	glGenBuffers(1, &eleBufID);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eleBufID);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, buf->indicies.size()*sizeof(unsigned int), buf->indicies.data(), GL_STREAM_DRAW);
+
+
+   glGenBuffers(4, buf->mID);
    glBindVertexArray(0);
 }
 double timeoutside = 0;
@@ -195,7 +202,7 @@ void GroundMap::render(shared_ptr<MatrixStack> Projection,
    for(unsigned int i = 0; i < blocks.size(); i++){
       vec3 dvec = blocks[i]->getPosition() * State::scaler - State::viewPosition;
       float dist = sqrt(pow(dvec[0],2) + pow(dvec[2],2));
-      if(true || dist < 50 * State::scaler){
+      if(dist < 50 * State::scaler){
          inenter = glfwGetTime();
          blocks[i]->render(Projection, View, Model, buffers[blocks[i]->type]);
          //time code below 
@@ -224,49 +231,56 @@ void GroundMap::renderType(int type, mat4 P, mat4 V){
    
 
    glBindVertexArray(buf->vaoID);
-
-   //setup the M mats
-//   GLuint mBufferID[1];
-//   glGenBuffers(4, mBufferID);
-//   glBindBuffer(GL_ARRAY_BUFFER, mBufferID[0]);
-//   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * buf->m.size(), buf->m.data(), GL_DYNAMIC_DRAW);
-//   glEnableVertexAttribArray(3);
-//   glVertexAttribPointer(3,16,GL_FLOAT,GL_FALSE,0,(void *) 0);
-
-//   glBindBuffer(GL_ARRAY_BUFFER, mBufferID[1]);
-//   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * buf->m2.size(), buf->m2.data(), GL_DYNAMIC_DRAW);
-//   glEnableVertexAttribArray(4);
-//   glVertexAttribPointer(4,4,GL_FLOAT,GL_FALSE,0,(void *) 0);
-//
-//   glBindBuffer(GL_ARRAY_BUFFER, mBufferID[2]);
-//   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * buf->m3.size(), buf->m3.data(), GL_DYNAMIC_DRAW);
-//   glEnableVertexAttribArray(5);
-//   glVertexAttribPointer(5,4,GL_FLOAT,GL_FALSE,0,(void *) 0);
-//
-//   glBindBuffer(GL_ARRAY_BUFFER, mBufferID[3]);
-//   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * buf->m4.size(), buf->m4.data(), GL_DYNAMIC_DRAW);
-//   glEnableVertexAttribArray(6);
-//   glVertexAttribPointer(6,4,GL_FLOAT,GL_FALSE,0,(void *) 0);
-
-   //bind the null
-   glBindVertexArray(0);
-
-   //the render
    buf->shader->bind();
    buf->texture.bind(buf->shader->getUniform("Texture0"));
-   
+
+   //setup the M mats
+   GLuint *mBufferID = buf->mID;
+
+   glEnableVertexAttribArray(3);
+   glBindBuffer(GL_ARRAY_BUFFER, mBufferID[0]);
+   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * buf->m1.size(), NULL, GL_DYNAMIC_DRAW);
+   glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * buf->m1.size(), buf->m1.data());
+   glVertexAttribPointer(3,4,GL_FLOAT,GL_FALSE,0,(void *) 0);
+	glVertexAttribDivisor(3, 1);
+
+   glEnableVertexAttribArray(4);
+   glBindBuffer(GL_ARRAY_BUFFER, mBufferID[1]);
+   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * buf->m1.size(), NULL, GL_DYNAMIC_DRAW);
+   glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * buf->m2.size(), buf->m2.data());
+   glVertexAttribPointer(4,4,GL_FLOAT,GL_FALSE,0,(void *) 0);
+	glVertexAttribDivisor(4, 1);
+
+   glEnableVertexAttribArray(5);
+   glBindBuffer(GL_ARRAY_BUFFER, mBufferID[2]);
+   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * buf->m1.size(), NULL, GL_DYNAMIC_DRAW);
+   glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * buf->m3.size(), buf->m3.data());
+   glVertexAttribPointer(5,4,GL_FLOAT,GL_FALSE,0,(void *) 0);
+	glVertexAttribDivisor(5, 1);
+
+   glEnableVertexAttribArray(6);
+   glBindBuffer(GL_ARRAY_BUFFER, mBufferID[3]);
+   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * buf->m1.size(), NULL, GL_DYNAMIC_DRAW);
+   glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * buf->m4.size(), buf->m4.data());
+   glVertexAttribPointer(6,4,GL_FLOAT,GL_FALSE,0,(void *) 0);
+	glVertexAttribDivisor(6, 1);
+
+   //the render
+   buf->texture.bind(buf->shader->getUniform("Texture0"));
    glUniformMatrix4fv(buf->shader->getUniform("P"), 1, GL_FALSE, value_ptr(P));
    glUniformMatrix4fv(buf->shader->getUniform("V"), 1, GL_FALSE, value_ptr(V));
-   glUniform1fv(buf->shader->getUniform("m"), buf->m.size(), buf->m.data());
-   
    updateLights(buf->shader);
-
    glBindVertexArray(buf->vaoID);
-   glDrawArraysInstanced(GL_TRIANGLES, 0, buf->verticies.size(), (buf->nElements <  20 ? buf->nElements : 20));
+   glDrawElementsInstanced(GL_TRIANGLES, buf->indicies.size(), GL_UNSIGNED_INT, (const void *) 0, buf->nElements);
    glBindVertexArray(0);
-
    buf->texture.unbind();
    buf->shader->unbind();
+
+   buf->nElements = 0;
+   buf->m1.clear();
+   buf->m2.clear();
+   buf->m3.clear();
+   buf->m4.clear();
 }
 /**********************/
 /*  END GROUND CLASS  */
@@ -289,19 +303,24 @@ void TypeBuffer::fill(){
          verticies.push_back(mesh[j]->posBuf[i]);
       }
       for(int i = 0; i < mesh[j]->norBuf.size(); i++){
-         normals.push_back(mesh[j]->posBuf[i]);
+         normals.push_back(mesh[j]->norBuf[i]);
       }
       for(int i = 0; i < mesh[j]->texBuf.size(); i++){
-         textures.push_back(mesh[j]->posBuf[i]);
+         textures.push_back(mesh[j]->texBuf[i]);
+      }
+      for(int i = 0; i < mesh[j]->eleBuf.size(); i++){
+         indicies.push_back(mesh[j]->eleBuf[i]);
       }
    }
 }
 void TypeBuffer::addMat(mat4 M){
    for(int i = 0; i < 4; i++){
-      for(int j = 0; j < 4; j++){
-         m.push_back(M[i][j]);
-      }
+      m1.push_back(M[0][i]);
+      m2.push_back(M[1][i]);
+      m3.push_back(M[2][i]);
+      m4.push_back(M[3][i]);
    }
+   nElements++;
 }
 /**********************/
 /*  END TBUFF  CLASS  */
@@ -566,10 +585,13 @@ void LandType::init(){
    shader->addUniform("shine");
    shader->addUniform("lightPos");
    shader->addUniform("Texture0");
-   shader->addUniform("m");
    shader->addAttribute("vertPos");
    shader->addAttribute("vertNor");
    shader->addAttribute("vertTex");
+   shader->addAttribute("m1");
+   shader->addAttribute("m2");
+   shader->addAttribute("m3");
+   shader->addAttribute("m4");
    setMaterial(shader, TOPO_MATERIAL);
 }
 
@@ -662,9 +684,9 @@ void Cover::render(shared_ptr<MatrixStack> Model,
    Model->pushMatrix();
    Model->translate(trans);
    Model->scale(scale);
-   Model->rotate(rotat[0], vec3(1,0,0));
-   Model->rotate(rotat[1], vec3(0,1,0));
-   Model->rotate(rotat[2], vec3(0,0,1));
+   //Model->rotate(rotat[0], vec3(1,0,0));
+   //Model->rotate(rotat[1], vec3(0,1,0));
+   //Model->rotate(rotat[2], vec3(0,0,1));
    buffer->addMat(Model->topMatrix());
    //glUniformMatrix4fv(shader->getUniform("M"), 1, GL_FALSE, value_ptr(Model->topMatrix()));
    //for(unsigned int i = 0; i < mesh.size(); i++){
