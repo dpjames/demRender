@@ -44,6 +44,7 @@ class Updateable {
 class TypeBuffer {
    public :
       GLuint vaoID;
+      GLuint mID[4];
       int nElements;
       vector<shared_ptr<Shape>> mesh;
       int type;
@@ -52,7 +53,11 @@ class TypeBuffer {
       vector<GLfloat> verticies;
       vector<GLfloat> normals;
       vector<GLfloat> textures;
-      vector<GLfloat> m;
+      vector<unsigned int> indicies;
+      vector<GLfloat> m1;
+      vector<GLfloat> m2;
+      vector<GLfloat> m3;
+      vector<GLfloat> m4;
       void init(int t);
       void addMat(mat4 M);
       void fill();
