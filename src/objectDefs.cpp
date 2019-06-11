@@ -147,41 +147,41 @@ void GroundMap::generateMap(unsigned char *lcdata,
    }
 }
 void GroundMap::initBufferArrays(int type){
+   if(type == 42){
+      cout << "42" << endl;
+   }
    cout << "init buf arrays " << type << endl;
    shared_ptr<TypeBuffer> buf = buffers[type];
+   cout << ((buf->textures.size() != 0) ? "good" : "bad") << " " << type << endl;
    //setup the vertices
-   GLuint vertexBufferID;
    GLuint vertexArrayID;
    glGenVertexArrays(1, &vertexArrayID);
    glBindVertexArray(vertexArrayID);
    buf->vaoID = vertexArrayID;
    
-   glGenBuffers(1, &vertexBufferID);
-   glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
-   glBufferData(GL_ARRAY_BUFFER, sizeof(GL_FLOAT) * buf->verticies.size(), buf->verticies.data(), GL_STREAM_DRAW);
+   glGenBuffers(1, &(buf->vertexBufferID));
+   glBindBuffer(GL_ARRAY_BUFFER, buf->vertexBufferID);
+   glBufferData(GL_ARRAY_BUFFER, sizeof(GL_FLOAT) * buf->verticies.size(), buf->verticies.data(), GL_DYNAMIC_DRAW);
    glEnableVertexAttribArray(0);
    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE, 0,(void *) 0);
-   
+
    //setup the normals
-   GLuint normalBufferID;
-   glGenBuffers(1, &normalBufferID);
-   glBindBuffer(GL_ARRAY_BUFFER, normalBufferID);
-   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * buf->normals.size(), buf->normals.data(), GL_STREAM_DRAW);
+   glGenBuffers(1, &(buf->normalBufferID));
+   glBindBuffer(GL_ARRAY_BUFFER, buf->normalBufferID);
+   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * buf->normals.size(), buf->normals.data(), GL_DYNAMIC_DRAW);
    glEnableVertexAttribArray(1);
    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
    
    //setup the textur coord
-   GLuint textureBufferID;
-   glGenBuffers(1, &textureBufferID);
-   glBindBuffer(GL_ARRAY_BUFFER, textureBufferID);
-   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * buf->textures.size(), buf->textures.data(), GL_STREAM_DRAW);
+   glGenBuffers(1, &(buf->textureBufferID));
+   glBindBuffer(GL_ARRAY_BUFFER, buf->textureBufferID);
+   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * buf->textures.size(), buf->textures.data(), GL_DYNAMIC_DRAW);
    glEnableVertexAttribArray(2);
    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*) 0);
 
-   GLuint eleBufID; 
-	glGenBuffers(1, &eleBufID);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eleBufID);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, buf->indicies.size()*sizeof(unsigned int), buf->indicies.data(), GL_STREAM_DRAW);
+	glGenBuffers(1, &(buf->indiciesBufferID));
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf->indiciesBufferID);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, buf->indicies.size()*sizeof(unsigned int), buf->indicies.data(), GL_DYNAMIC_DRAW);
 
 
    glGenBuffers(4, buf->mID);
@@ -210,7 +210,7 @@ void GroundMap::render(shared_ptr<MatrixStack> Projection,
       }
    }
    //time code below
-   exitTime = glfwGetTime();cout << "time total: " << exitTime - enterTime << "|||";cout << "inTime: " << incount << "|||";cout << "out time: " << incount - (exitTime - enterTime) << endl;
+   //exitTime = glfwGetTime();cout << "time total: " << exitTime - enterTime << "|||";cout << "inTime: " << incount << "|||";cout << "out time: " << incount - (exitTime - enterTime) << endl;
    Model->popMatrix();
    renderAll((Projection->topMatrix()), View);
 }
@@ -227,12 +227,9 @@ void GroundMap::renderType(int type, mat4 P, mat4 V){
    if(buf == NULL || buf->verticies.size() == 0){
       return;
    }
-   cout << "rendering " << type << endl;
-   
-
    glBindVertexArray(buf->vaoID);
    buf->shader->bind();
-   buf->texture.bind(buf->shader->getUniform("Texture0"));
+   
 
    //setup the M mats
    GLuint *mBufferID = buf->mID;
@@ -264,17 +261,34 @@ void GroundMap::renderType(int type, mat4 P, mat4 V){
    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * buf->m4.size(), buf->m4.data());
    glVertexAttribPointer(6,4,GL_FLOAT,GL_FALSE,0,(void *) 0);
 	glVertexAttribDivisor(6, 1);
+   
+
+   
+   glEnableVertexAttribArray(0);
+   glBindBuffer(GL_ARRAY_BUFFER, buf->vertexBufferID);
+   glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE, 0,(void *) 0);
+
+   glEnableVertexAttribArray(1);
+   glBindBuffer(GL_ARRAY_BUFFER, buf->normalBufferID);
+   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
+
+   glEnableVertexAttribArray(2);
+   glBindBuffer(GL_ARRAY_BUFFER, buf->textureBufferID);
+   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*) 0);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf->indiciesBufferID);
+
 
    //the render
-   buf->texture.bind(buf->shader->getUniform("Texture0"));
    glUniformMatrix4fv(buf->shader->getUniform("P"), 1, GL_FALSE, value_ptr(P));
    glUniformMatrix4fv(buf->shader->getUniform("V"), 1, GL_FALSE, value_ptr(V));
    updateLights(buf->shader);
-   glBindVertexArray(buf->vaoID);
+   buf->texture.bind(buf->shader->getUniform("Texture0"));
    glDrawElementsInstanced(GL_TRIANGLES, buf->indicies.size(), GL_UNSIGNED_INT, (const void *) 0, buf->nElements);
-   glBindVertexArray(0);
    buf->texture.unbind();
    buf->shader->unbind();
+   glBindVertexArray(0);
+
 
    buf->nElements = 0;
    buf->m1.clear();
@@ -291,7 +305,6 @@ void GroundMap::renderType(int type, mat4 P, mat4 V){
 /**********************/
 void TypeBuffer::init(int t){
    type = t;
-   vector<shared_ptr<Shape>> mesh;
    LandType::getDrawDataForType(type, this->texture, this->mesh);
    this->shader = LandType::shader;
    fill();
@@ -310,6 +323,12 @@ void TypeBuffer::fill(){
       }
       for(int i = 0; i < mesh[j]->eleBuf.size(); i++){
          indicies.push_back(mesh[j]->eleBuf[i]);
+      }
+   }
+   if(textures.size() == 0 && mesh.size() != 0){ //if it doesnt have texture coordinates too bad.
+      cout << "generating texture coordinates" << endl;
+      for(int i = 0; i < verticies.size()/3 * 2; i++){
+         textures.push_back(rand() % 100 / 100.0f);
       }
    }
 }
@@ -545,6 +564,7 @@ shared_ptr<LandDescription> LandType::readLandDescription(int type){
       readObj(obj, ld->mesh);
       ld->texture.setFilename(tex);
       ld->texture.init();
+      ld->texture.setUnit(0);
       ld->texture.setWrapModes(GL_REPEAT,GL_REPEAT);
       readMetaFile(meta, ld);
       return ld;

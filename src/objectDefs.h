@@ -58,6 +58,10 @@ class TypeBuffer {
       vector<GLfloat> m2;
       vector<GLfloat> m3;
       vector<GLfloat> m4;
+      GLuint textureBufferID;
+      GLuint vertexBufferID;
+      GLuint normalBufferID;
+      GLuint indiciesBufferID;
       void init(int t);
       void addMat(mat4 M);
       void fill();
