@@ -119,9 +119,9 @@ void GroundMap::generateMap(unsigned char *lcdata,
    cout << "generating ground map" << endl;
    //int DY = 1;
    //int DX = 1;
-   int DY = 1;
-   int DX = 1;
-   float density = 3;
+   int DY = 2;
+   int DX = 2;
+   float density = 10;
    //unsigned char seen[width * height] = {};
    for(int y = 0; y < lcheight; y+=DY){
       for(int x = 0; x < lcwidth; x+=DX){
@@ -192,27 +192,43 @@ double exitTime = 0;
 double enterTime = 0;
 double incount = 0;
 double inenter = 0;
-
+double renderStart = 0;
+double renderTime = 0;
+float dcount = 0;
+float dcstart = 0;
 void GroundMap::render(shared_ptr<MatrixStack> Projection,
       mat4 View,
       shared_ptr<MatrixStack> Model){
    //time code below
-   timeoutside = 0;exitTime = 0;enterTime = 0;incount = 0;inenter = 0;enterTime = glfwGetTime();
+   timeoutside = 0;exitTime = 0;enterTime = 0;incount = 0;inenter = 0;enterTime = glfwGetTime(); dcount = 0;
    Model->pushMatrix();
+   float thresh = 50 * State::scaler;
+   vec3 planeNorm = vec3(sin(State::theta),0,cos(State::theta));
+   //dcstart = glfwGetTime();
+   //dcount+=glfwGetTime() - dcstart; 
    for(unsigned int i = 0; i < blocks.size(); i++){
-      vec3 dvec = blocks[i]->getPosition() * State::scaler - State::viewPosition;
-      float dist = sqrt(pow(dvec[0],2) + pow(dvec[2],2));
-      if(dist < 50 * State::scaler){
-         inenter = glfwGetTime();
-         blocks[i]->render(Projection, View, Model, buffers[blocks[i]->type]);
-         //time code below 
-         incount+=glfwGetTime() - inenter;
+      dcstart = glfwGetTime();
+      vec3 bpos = blocks[i]->getPosition() * State::scaler;
+      vec3 dvec = bpos - State::viewPosition;
+      dcount+=glfwGetTime() - dcstart; 
+      if(!(dvec[0] > thresh || dvec[2] > thresh)){
+         //float d = -planeNorm[0] * State::viewPosition[0] - planeNorm[2] * State::viewPosition[2];
+         if(planeNorm[0] * (bpos[0] - State::viewPosition[0]) + planeNorm[2] + (bpos[2] - State::viewPosition[2]) > 0){
+            if(sqrt(pow(dvec[0],2) + pow(dvec[2],2)) < thresh){
+               inenter = glfwGetTime();
+               blocks[i]->render(Projection, View, Model, buffers[blocks[i]->type]);
+               //time code below 
+               incount+=glfwGetTime() - inenter;
+            }
+         }
       }
    }
-   //time code below
-   //exitTime = glfwGetTime();cout << "time total: " << exitTime - enterTime << "|||";cout << "inTime: " << incount << "|||";cout << "out time: " << incount - (exitTime - enterTime) << endl;
    Model->popMatrix();
+   renderStart = glfwGetTime();
    renderAll((Projection->topMatrix()), View);
+   renderTime = glfwGetTime() - renderStart;
+   //time code below
+   //exitTime = glfwGetTime();cout << "time total: " << exitTime - enterTime << "|||";cout << "inTime: " << incount << "|||";cout << "out time: " << incount - (exitTime - enterTime) << "|||" << "render time" << renderTime << "||| dcount " << dcount << endl ;
 }
 void GroundMap::updateMaterial(){
 
@@ -288,8 +304,6 @@ void GroundMap::renderType(int type, mat4 P, mat4 V){
    buf->texture.unbind();
    buf->shader->unbind();
    glBindVertexArray(0);
-
-
    buf->nElements = 0;
    buf->m1.clear();
    buf->m2.clear();
@@ -332,6 +346,7 @@ void TypeBuffer::fill(){
       }
    }
 }
+
 void TypeBuffer::addMat(mat4 M){
    for(int i = 0; i < 4; i++){
       m1.push_back(M[0][i]);
@@ -627,8 +642,8 @@ void LandCover::init(int landType, uint32_t elev, float indensity, uint32_t *dem
    shader = LandType::shader;
    LandType::getDrawDataForType(landType, texture, mesh);
    density = indensity;  
-   minTrans = vec3(originx - DX, elev, originy - DY);
-   maxTrans = vec3(originx + DX, elev, originy + DY);
+   minTrans = vec3(originx - DX * DX, elev, originy - DY * DY);
+   maxTrans = vec3(originx + DX * DX, elev, originy + DY * DY);
    LandType::fillTransforms(landType, maxRotat, minRotat, maxScale, minScale);
    globalTrans = vec3(0,0,0); // this will prob be removed  TODO
    globalScale = vec3(1,1,1); // this will prob be removed
@@ -676,13 +691,11 @@ void LandCover::render(shared_ptr<MatrixStack> Projection,
    //updateLights(shader);
    //glUniformMatrix4fv(shader->getUniform("P"), 1, GL_FALSE, value_ptr(Projection->topMatrix()));
    //glUniformMatrix4fv(shader->getUniform("V"), 1, GL_FALSE, value_ptr(View));
-   Model->pushMatrix();
    //texture.bind(shader->getUniform("Texture0"));
    for(unsigned int i = 0; i < items.size(); i++){
       items[i]->render(Model, shader, buffer);
    }
    //texture.unbind();
-   Model->popMatrix();
    //shader->unbind();
 
 }
