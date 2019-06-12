@@ -41,3 +41,20 @@ M - change the ground material... fun to see how the light changes as you move a
 Z - turn on wireframe
 X - turn off wireframe
    
+
+
+Notes about cool things the program does:
+
+Instanced rendering for most of the models - huge preformance boost.
+
+util/tiffcon.cpp Takes in a mapping raster (DEM) in tif format (specifed as UINT32 data type). Then converts that file into a binary file of uint32_t tightly packed. 
+   The format is: 32 bits for the width, 32 bits for the height and then, width * height * 32 bits for the elevation data. This allows full resolution elevation data!
+
+The fauna is generated where it would really be in the world based on USGS landcover dataset.
+
+The satallite imagery texture is MASSIVE. The original data was 15Gb per area. I obviously had to cut this down dramatically.
+
+This program can read and display ANYWHERE in the US (or with the right data). It is not restricted to the example datasets I've supplied. I plan on creating a workflow to auto generate the data given a lat/lon. 
+   It would be extra cool to generate the terrain as you walk dynamcally (chunk the terrain like minecraft, but pull it from a data server).
+
+
