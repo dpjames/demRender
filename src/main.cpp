@@ -143,8 +143,6 @@ public:
       if(State::capturedCursor){
          glfwSetCursorPos(window, width/2, height/2);
       }
-      cout << State::theta/M_PI << "||";
-      cout << sin(State::theta) << "," << cos(State::theta) << endl;
    }
 	void resizeCallback(GLFWwindow *window, int width, int height)
 	{
