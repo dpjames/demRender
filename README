@@ -17,6 +17,10 @@ Recommended runs:
 
 ./demRender -p YOSEMITE_HD -d 5 -z .001
 ./demRender -p RAINIER_LARGE -d 5 -z .001
+./demRender -p ZION -d 5 -z .0001
+
+You can also use the three provided scripts zion.sh, yosemite.sh, and rainier.sh. They assume the binary demRender will be inside the build folder.
+Also they set d to 1, so expect a preformance hit unless on a fast computer.
 
 It takes a second to load up, since the areas are pretty large and it calculates a lot of normals. Setting -d higher will reduce load times.
 For this version of the project I modified the fauna to be instance rendered instead of every single item getting a draw call.

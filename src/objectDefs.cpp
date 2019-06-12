@@ -142,7 +142,7 @@ void GroundMap::generateMap(unsigned char *lcdata,
          buffers[type]->nElements+=density;
       }
    }
-   for(int i = 0; i < buffers.size(); i++){
+   for(unsigned int i = 0; i < buffers.size(); i++){
       if(buffers[i] != NULL){
          initBufferArrays(i);
       }
@@ -186,8 +186,8 @@ void GroundMap::initBufferArrays(int type){
    glBindVertexArray(0);
 
 
-   for(int i = 0; i < buf->children.size(); i++){
-      for(int j = 0; j < buf->children[i]->items.size(); j++){
+   for(unsigned int i = 0; i < buf->children.size(); i++){
+      for(unsigned int j = 0; j < buf->children[i]->items.size(); j++){
          shared_ptr<Cover> item = buf->children[i]->items[j];
          vec3 trans = item->trans;
          vec3 scale = item->scale;
@@ -323,24 +323,24 @@ void TypeBuffer::init(int t){
 }
 void TypeBuffer::fill(){
    int offset = 0;
-   for(int j = 0; j < mesh.size(); j++){
-      for(int i = 0; i < mesh[j]->posBuf.size(); i++){
+   for(unsigned int j = 0; j < mesh.size(); j++){
+      for(unsigned int i = 0; i < mesh[j]->posBuf.size(); i++){
          verticies.push_back(mesh[j]->posBuf[i]);
       }
-      for(int i = 0; i < mesh[j]->norBuf.size(); i++){
+      for(unsigned int i = 0; i < mesh[j]->norBuf.size(); i++){
          normals.push_back(mesh[j]->norBuf[i]);
       }
-      for(int i = 0; i < mesh[j]->texBuf.size(); i++){
+      for(unsigned int i = 0; i < mesh[j]->texBuf.size(); i++){
          textures.push_back(mesh[j]->texBuf[i]);
       }
-      for(int i = 0; i < mesh[j]->eleBuf.size(); i++){
+      for(unsigned int i = 0; i < mesh[j]->eleBuf.size(); i++){
          indicies.push_back(mesh[j]->eleBuf[i] + offset);
       }
       offset = verticies.size();
    }
    if(textures.size() == 0 && mesh.size() != 0){ //if it doesnt have texture coordinates too bad.
       cout << "generating texture coordinates" << endl;
-      for(int i = 0; i < verticies.size()/3 * 2; i++){
+      for(unsigned int i = 0; i < verticies.size()/3 * 2; i++){
          textures.push_back(rand() % 100 / 100.0f);
       }
    }
@@ -953,7 +953,7 @@ void Collectables::render(shared_ptr<MatrixStack> Projection,mat4 View,shared_pt
    Model->pushMatrix();
    glUniformMatrix4fv(shader->getUniform("P"), 1, GL_FALSE, value_ptr(Projection->topMatrix()));
    glUniformMatrix4fv(shader->getUniform("V"), 1, GL_FALSE, value_ptr(View));
-   for(int i = 0; i < positions.size(); i++){
+   for(unsigned int i = 0; i < positions.size(); i++){
       Model->pushMatrix();
          Model->translate(vec3(positions[i]));
          Model->scale(vec3(.1,.1,.1));
@@ -969,7 +969,7 @@ void Collectables::render(shared_ptr<MatrixStack> Projection,mat4 View,shared_pt
 }
 void Collectables::update(double dt){
    rotationCounter+=M_PI/3000 * dt;
-   for(int i = 0; i < positions.size(); i++){
+   for(unsigned int i = 0; i < positions.size(); i++){
       positions[i][1] = baseHeights[i] + cos(rotationCounter + positions[i][3]) * 4;
       if(length(State::viewPosition / State::scaler - vec3(positions[i])) < 2){
          positions.erase(positions.begin()+i); 
