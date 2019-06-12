@@ -212,18 +212,9 @@ float dcstart = 0;
 void GroundMap::render(shared_ptr<MatrixStack> Projection,
       mat4 View,
       shared_ptr<MatrixStack> Model){
-
-   //time code below
-   //timeoutside = 0;exitTime = 0;enterTime = 0;incount = 0;inenter = 0;enterTime = glfwGetTime(); dcount = 0;
-   //renderStart = glfwGetTime();
-
    glDisable(GL_CULL_FACE);
    renderAll((Projection->topMatrix()), View, Model->topMatrix());
    glEnable(GL_CULL_FACE);
-   
-   //renderTime = glfwGetTime() - renderStart;
-   //time code below
-   //exitTime = glfwGetTime();cout << "time total: " << exitTime - enterTime << "|||";cout << "inTime: " << incount << "|||";cout << "out time: " << incount - (exitTime - enterTime) << "|||" << "render time" << renderTime << "||| dcount " << dcount << endl ;
 }
 void GroundMap::updateMaterial(){
 
@@ -897,7 +888,6 @@ void Skybox::render(shared_ptr<MatrixStack> Projection,mat4 View,shared_ptr<Matr
    glDisable(GL_CULL_FACE);
    Model->pushMatrix();
       shader->bind();
-      Model->scale(vec3(100000*State::scaler,100000*State::scaler,100000*State::scaler)); 
       glUniformMatrix4fv(shader->getUniform("P"), 1, GL_FALSE, value_ptr(Projection->topMatrix()));
       glDepthFunc(GL_LEQUAL);
       glUniformMatrix4fv(shader->getUniform("V"), 1, GL_FALSE, value_ptr(View));
