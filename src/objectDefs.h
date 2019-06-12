@@ -30,7 +30,7 @@ using std::fstream;
 using glm::vec3;
 using glm::vec4;
 using glm::mat4;
-
+class LandCover;
 class Renderable {
    public :
       virtual void render(shared_ptr<MatrixStack> Projection,mat4 View,shared_ptr<MatrixStack> Model) = 0;
@@ -44,7 +44,6 @@ class Updateable {
 class TypeBuffer {
    public :
       GLuint vaoID;
-      GLuint mID[4];
       int nElements;
       vector<shared_ptr<Shape>> mesh;
       int type;
@@ -54,14 +53,15 @@ class TypeBuffer {
       vector<GLfloat> normals;
       vector<GLfloat> textures;
       vector<unsigned int> indicies;
-      vector<GLfloat> m1;
-      vector<GLfloat> m2;
-      vector<GLfloat> m3;
-      vector<GLfloat> m4;
+      vector<GLfloat> translations;
+      vector<GLfloat> scales;
+      vector<shared_ptr<LandCover>> children;
       GLuint textureBufferID;
       GLuint vertexBufferID;
       GLuint normalBufferID;
       GLuint indiciesBufferID;
+      GLuint tBufferID;
+      GLuint sBufferID;
       void init(int t);
       void addMat(mat4 M);
       void fill();
@@ -95,11 +95,10 @@ class Topo: public Renderable {
 };
 
 class Cover {
-   private :
+   public : 
       glm::vec3 trans;
       glm::vec3 scale;
       glm::vec3 rotat;
-   public : 
       void init(glm::vec3 t, glm::vec3 s, glm::vec3 r);
       void render(shared_ptr<MatrixStack> Model,
                   shared_ptr<Program> prog,
@@ -109,7 +108,6 @@ class Cover {
 class LandCover {
    private :
       vector<shared_ptr<Shape>> mesh;
-      vector<shared_ptr<Cover>> items;
       Texture texture;
       float density;
       glm::vec3 maxTrans;
@@ -124,6 +122,7 @@ class LandCover {
       void fillItems(uint32_t *elev, unsigned int width, unsigned int height,
                      unsigned int originx, unsigned int originy);
    public :
+      vector<shared_ptr<Cover>> items;
       int type;
       shared_ptr<Program> shader;
       void init(int landType, uint32_t elev, float density, uint32_t *dem, int demwidth, int demheight, int originx, int originy, int DX, int DY);
@@ -145,8 +144,8 @@ class GroundMap : public Renderable {
                        int lcheight, 
                        int demwidth, 
                        int demheight);
-      void renderAll(mat4 P, mat4 V);
-      void renderType(int type, mat4 P, mat4 V);
+      void renderAll(mat4 P, mat4 V, mat4 M);
+      void renderType(int type, mat4 P, mat4 V, mat4 M);
    public :
       void init(string lcfile, uint32_t *demdata, int demwidth, int demheight);
       void render(shared_ptr<MatrixStack> Projection,
