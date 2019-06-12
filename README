@@ -1,4 +1,4 @@
-David James P4
+David James FinalProject
 
 Usage:
 
@@ -19,16 +19,17 @@ Recommended runs:
 ./demRender -p RAINIER_LARGE -d 5 -z .001
 
 It takes a second to load up, since the areas are pretty large and it calculates a lot of normals. Setting -d higher will reduce load times.
-Also models load in based on your proximity to them, so as you approach different areas, different models will appear.
-These models are generated based on the actual landcover data from USGS. Right now only 5 of the types are implemented, but
+For this version of the project I modified the fauna to be instance rendered instead of every single item getting a draw call.
+This has moved a TON of the computation to the GPU which fixed the CPU bottlenecks I was experiencing. 
+These models are generated based on the actual landcover data from USGS. Right now only ~10 of the types are implemented, but
 the infrastructure is in place to add the rest by simply creating the obj file. (The code looks in a specified folder (resources/LANDCOVER) for keys and values to generate the models)
-I am looking for a way to reduce all the draw calls to boost performance dramatically. 
+Also I added coins placed at random around the map. Collect them all for something fun.
 Have fun!
 
 INPUT:
 
 by default the mouse is captured when you mouse over. to release the mouse, left click. To regrab the mouse, left click again.
-   Note, that if you aren't expecting it to grab the mouse the view could fly all over the place as you search for your mouse... if this happens just click.
+***Note, that if you aren't expecting it to grab the mouse the view could fly all over the place as you search for your mouse... if this happens just click.***
 
 WASD - movement as expected
 Space - unlock your y axis from the ground plane. (allow use of E and Q)
