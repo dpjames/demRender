@@ -888,6 +888,7 @@ void Skybox::render(shared_ptr<MatrixStack> Projection,mat4 View,shared_ptr<Matr
    glDisable(GL_CULL_FACE);
    Model->pushMatrix();
       shader->bind();
+      Model->scale(vec3(100000 * State::scaler));
       glUniformMatrix4fv(shader->getUniform("P"), 1, GL_FALSE, value_ptr(Projection->topMatrix()));
       glDepthFunc(GL_LEQUAL);
       glUniformMatrix4fv(shader->getUniform("V"), 1, GL_FALSE, value_ptr(View));
