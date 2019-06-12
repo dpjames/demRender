@@ -137,8 +137,8 @@ void GroundMap::generateMap(unsigned char *lcdata,
          if(buffers[type] == NULL){
             buffers[type] = make_shared<TypeBuffer>();
             buffers[type]->init(type);
-            buffers[type]->children.push_back(block);
          }
+         buffers[type]->children.push_back(block);
          buffers[type]->nElements+=density;
       }
    }
@@ -283,6 +283,7 @@ void GroundMap::renderType(int type, mat4 P, mat4 V, mat4 M){
    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * buf->translations.size(), buf->translations.data());
    glVertexAttribPointer(3,3,GL_FLOAT,GL_FALSE,0,(void *) 0);
 	glVertexAttribDivisor(3, 1);
+   cout << buf->translations.size() << " " << type << endl;
    
 
    glEnableVertexAttribArray(4);
