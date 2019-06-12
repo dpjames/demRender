@@ -121,7 +121,7 @@ void GroundMap::generateMap(unsigned char *lcdata,
    //int DX = 1;
    int DY = 2;
    int DX = 2;
-   float density = 10;
+   float density = 7;
    //unsigned char seen[width * height] = {};
    for(int y = 0; y < lcheight; y+=DY){
       for(int x = 0; x < lcwidth; x+=DX){
@@ -149,13 +149,7 @@ void GroundMap::generateMap(unsigned char *lcdata,
    }
 }
 void GroundMap::initBufferArrays(int type){
-   if(type == 42){
-      cout << "42" << endl;
-   }
-   cout << "init buf arrays " << type << endl;
    shared_ptr<TypeBuffer> buf = buffers[type];
-   //cout << ((buf->textures.size() != 0) ? "good" : "bad") << " " << type << endl;
-   //setup the vertices
    GLuint vertexArrayID;
    glGenVertexArrays(1, &vertexArrayID);
    glBindVertexArray(vertexArrayID);
@@ -219,14 +213,14 @@ void GroundMap::render(shared_ptr<MatrixStack> Projection,
       mat4 View,
       shared_ptr<MatrixStack> Model){
    //time code below
-   timeoutside = 0;exitTime = 0;enterTime = 0;incount = 0;inenter = 0;enterTime = glfwGetTime(); dcount = 0;
+   //timeoutside = 0;exitTime = 0;enterTime = 0;incount = 0;inenter = 0;enterTime = glfwGetTime(); dcount = 0;
    renderStart = glfwGetTime();
 
    renderAll((Projection->topMatrix()), View, Model->topMatrix());
    
    renderTime = glfwGetTime() - renderStart;
    //time code below
-   exitTime = glfwGetTime();cout << "time total: " << exitTime - enterTime << "|||";cout << "inTime: " << incount << "|||";cout << "out time: " << incount - (exitTime - enterTime) << "|||" << "render time" << renderTime << "||| dcount " << dcount << endl ;
+   //exitTime = glfwGetTime();cout << "time total: " << exitTime - enterTime << "|||";cout << "inTime: " << incount << "|||";cout << "out time: " << incount - (exitTime - enterTime) << "|||" << "render time" << renderTime << "||| dcount " << dcount << endl ;
 }
 void GroundMap::updateMaterial(){
 
@@ -283,7 +277,6 @@ void GroundMap::renderType(int type, mat4 P, mat4 V, mat4 M){
    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(GLfloat) * buf->translations.size(), buf->translations.data());
    glVertexAttribPointer(3,3,GL_FLOAT,GL_FALSE,0,(void *) 0);
 	glVertexAttribDivisor(3, 1);
-   cout << buf->translations.size() << " " << type << endl;
    
 
    glEnableVertexAttribArray(4);
@@ -335,6 +328,7 @@ void TypeBuffer::init(int t){
    nElements = 0;
 }
 void TypeBuffer::fill(){
+   int offset = 0;
    for(int j = 0; j < mesh.size(); j++){
       for(int i = 0; i < mesh[j]->posBuf.size(); i++){
          verticies.push_back(mesh[j]->posBuf[i]);
@@ -346,8 +340,9 @@ void TypeBuffer::fill(){
          textures.push_back(mesh[j]->texBuf[i]);
       }
       for(int i = 0; i < mesh[j]->eleBuf.size(); i++){
-         indicies.push_back(mesh[j]->eleBuf[i]);
+         indicies.push_back(mesh[j]->eleBuf[i] + offset);
       }
+      offset = verticies.size();
    }
    if(textures.size() == 0 && mesh.size() != 0){ //if it doesnt have texture coordinates too bad.
       cout << "generating texture coordinates" << endl;
@@ -819,6 +814,7 @@ vec3 State::lightCol     = State::initLightCol;
 float State::phi         = State::initPhi; 
 float State::theta       = State::initTheta; 
 float State::scaler = 1;
+bool State::special = false;
 
 //defaults
 GLfloat State::zscale = .001;
@@ -835,6 +831,7 @@ void State::reset(){
    State::phi          = State::initPhi;
    State::theta        = State::initTheta;
    State::viewPosition = State::initViewPosition;
+   State::special = false;
 }
 
 
@@ -984,6 +981,9 @@ void Collectables::update(double dt){
          positions.erase(positions.begin()+i); 
          baseHeights.erase(baseHeights.begin()+i); 
       }
+   }
+   if(positions.size() == 0){
+      State::special = true;
    }
 }
 void Collectables::updateMaterial(){

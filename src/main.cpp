@@ -185,7 +185,7 @@ public:
       player->init(State::viewPosition);
 
       coins = make_shared<Collectables>();
-      coins->init(100, ground);
+      coins->init(10, ground);
       renderables.push_back((shared_ptr<Renderable>) coins);
       updateables.push_back((shared_ptr<Updateable>) coins);
       
@@ -285,13 +285,16 @@ public:
          radius * sin(State::phi),
          radius * cos(State::phi) * cos((M_PI/2) - State::theta)
       ));
-      mat4 View = glm::lookAt(State::viewPosition, State::viewPosition + viewDir, vec3(0,1,0));
 
+      mat4 View = glm::lookAt(State::viewPosition, State::viewPosition + viewDir, vec3(0,1,0));
       Model->pushMatrix();
          Model->loadIdentity();
          Model->scale(vec3(State::scaler, State::scaler, State::scaler));
          for(unsigned int i = 0; i < renderables.size(); i++){
             renderables[i]->render(Projection,View,Model);
+            if(State::special){
+               renderables[i]->updateMaterial();
+            }
          }
          drawMinimap(width, height, Model, Projection, State::theta + M_PI / -2);
       Model->popMatrix();
