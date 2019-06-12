@@ -22,7 +22,7 @@ void main()
    scalemat[0][0] = scale[0];
    scalemat[1][1] = scale[1];
    scalemat[2][2] = scale[2];
-   mat4 myM = M * scalemat * transmat;
+   mat4 myM = M *  transmat * scalemat;
 	gl_Position = P * V * myM * vertPos;
 	fragNor = (V * myM *  vec4(vertNor, 0.0)).xyz;
    vpos = (V * myM * vertPos).xyz;
