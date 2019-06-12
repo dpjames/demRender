@@ -203,6 +203,7 @@ class LandType {
 
 class State {
    public :
+      static bool special;
       static vec3 initViewPosition;
       static float initPhi;
       static float initTheta;
